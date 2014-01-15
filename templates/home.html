@@ -1,0 +1,186 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Point-List</title>
+    
+    <link rel="stylesheet" type="text/css" href="styles/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="styles/Krona-One.css">
+    <link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="styles/bootstrap-theme.min.css">
+
+    <link rel="stylesheet" type="text/css" href="styles/main.css" />
+
+    <script type="text/javascript" src="scripts/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="scripts/jquery-ui.js"></script>
+    <script type="text/javascript" src="scripts/bootstrap.min.js"></script>
+    
+    <script type="text/javascript">
+      $(document).ready(function() {
+
+
+        // function m() {
+        //   $('.grip').fadeOut(200, function() {
+        //     $('.grip').toggleClass('fa-bars fa-chevron-right fa-chevron-down').fadeIn(200);
+        //   });
+        // }
+
+        var x = "fa-chevron-right";
+        var y = "fa-chevron-down";
+        var z = x + " " + y;
+
+        var SPEED = 200;
+
+
+        $(".collapse").on("show.bs.collapse", function() {
+          $(".grip").toggleClass(z);
+        });
+
+        $(".collapse").on("hide.bs.collapse", function() {
+          $(".grip").toggleClass(z);
+        });
+
+        // $('.grip').hover(m, m);
+
+
+        $('.grip').hide();
+
+
+
+
+        $('.scheme').hover(function() {
+          if ($('.grip').hasClass(x)) $('.grip').stop().fadeIn(50);
+        },
+        function() {
+          if ($('.grip').hasClass(x)) $('.grip').stop().fadeOut(200);
+        });
+
+
+
+
+
+        function toggleEdit(t, p) {
+          t.toggleClass('fa-pencil fa-check');
+          p.siblings('.edit').toggle();
+          p.siblings('.view').toggle();
+        }
+
+        function edit() {
+          var t = $(this);
+          var p = t.parent();
+
+          if (t.hasClass("fa-check")) {
+            var f = p.siblings(".edit").find(".form-inline");
+
+            f.removeClass("has-error");
+
+            if (f.find("input").filter(function() { return this.value == ""; }).length == 0) {
+              $.post(
+                "/save",
+                f.serialize() + "&key=" + p.attr("tag"),
+                function () { toggleEdit(t, p); }
+              );
+            } else {
+              f.addClass("has-error");
+            }
+          } else {
+            toggleEdit(t, p);
+          }
+        }
+
+
+
+
+        $(".fa-pencil").click(edit);
+
+
+        $(".hide").removeClass("hide").hide();
+      });
+
+
+
+    </script>
+  </head>
+    
+  <body>
+    
+
+
+    <div class="panel panel-default">
+
+
+
+
+      <div class="panel-heading">
+        <i class="grip fa fa-chevron-right"></i>
+
+        <span class="pull-right" tag="{{ m.key().id() }}">
+          <i class="fa fa-pencil"></i>
+
+          <i class="fa fa-times"></i>
+        </span>
+
+        <span class="view {{ "hide" if not m.username }}">
+          <span class="scheme" data-toggle="collapse" data-target="#row{{ m.key().id() }}">
+            {{ m.scheme.name }}
+          </span>
+
+          <span class="pull-right">
+            <span class="points">{{ m.points }}</span>
+
+            <i class="fa fa-refresh"></i>
+          </span>
+        </span>
+
+        <span class="edit {{ "hide" if m.username }}">
+          <form class="form-inline" method="post" role="form">
+            <span class="pull-left">
+              <input name="name"
+                placeholder="Name"
+                value="{{ m.scheme.name }}"
+                type="text" class="form-control input-sm" />
+            </span>
+
+            <span class="pull-right">
+              <input name="username"
+                placeholder="Username"
+                value="{{ m.username }}" 
+                type="text" class="form-control input-sm" />
+
+              <input name="password"
+                placeholder="Password"
+                value="{{ m.password }}"
+                type="password" class="form-control input-sm" />
+            </span>
+          </form>
+        </span>
+      </div>
+
+
+
+
+
+
+
+
+
+      <div class="collapse" id="row{{ m.key().id() }}">
+
+        <div class="panel-body">
+          {% if m.username %}
+            {{ m.content|safe }}
+          {% else %}
+            
+          {% endif %}
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,55 @@
+<div class="panel panel-default">
+
+  <div class="panel-heading">
+
+    <span class="header" data-toggle="collapse" href="#row{{ m.key().id() }}">
+      <i class="fa fa-bars"></i>
+
+      <span class="scheme cool-font">{{ m.scheme.name }}</span>
+    </span>
+
+    <span class="pull-right options" tag="{{ m.key().id() }}">
+      <span class="refresh{{ " hide" if not m.username }}">q
+        <span class="points cool-font">{{ m.points }}</span>
+
+        <i class="fa fa-refresh"></i>
+
+        <i class="fa fa-pencil"></i>
+      </span>
+
+      <span class="edit{{ " hide" if m.username }}">
+        <form class="form-inline settings" method="post" role="form">
+          <input name="username"
+            placeholder="Username"
+            value="{{ m.username }}" 
+            type="text" class="form-control input-sm"/>
+
+          <input name="password"
+            placeholder="Password"
+            value="{{ m.password }}"
+            type="password" class="form-control input-sm" />
+
+          <i class="fa fa-check"></i>
+        </form>
+      </span>
+
+      <span class="delete">
+        <i class="fa fa-times"></i>
+      </span>
+    </span>
+
+  </div>
+
+  <div class="collapse" id="row{{ m.key().id() }}">
+
+    <div class="panel-body">
+      {% if m.username %}
+        {{ m.content|safe }}
+      {% else %}
+        
+      {% endif %}
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,94 @@
+/*.cool-font {
+  font-family: 'Krona One', sans-serif !important;
+}
+*/
+
+body {
+  margin: 20px;
+}
+
+
+
+i {
+  color: lightgray;
+  font-size: 18px;
+  padding: 0px 10px;
+}
+
+i:hover {
+  cursor: pointer;
+  color: black;
+}
+
+i.grip {
+  position: absolute;
+}
+
+
+
+.edit form {
+  display: inline-block !important;
+  margin-bottom: 0px !important;
+}
+
+.edit input {
+  width: 200px;
+}
+
+
+.edit, .view {
+  left: 50px;
+  position: relative;
+}
+
+.scheme {
+  cursor: pointer;
+}
+
+.scheme:hover {
+  text-decoration: underline;
+}
+
+
+.panel-heading {
+  height: 48px;
+}
+
+
+
+/*
+
+.group {
+  font-style: italic;
+  font-weight: bold;
+}
+
+.group, .scheme, .points {
+  margin: 0px 15px;
+}
+
+.points {
+  font-size: 18px;
+}
+
+
+
+
+
+.header {
+  display: inline-block;
+  margin-left: 10px !important;
+
+  position: relative;
+  top: 4px;
+}
+
+
+
+.placeholder {
+  border: 1px solid #fcefa1;
+  background-color: #fbf9ee;
+  color: #363636;
+  margin: 3px 0px;
+}
+*/
