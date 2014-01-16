@@ -15,9 +15,9 @@ urls = [
     ),
 
     Route(
-        r'/delete',
-        handler=v.Delete,
-        name='Delete'
+        r'/remove',
+        handler=v.Remove,
+        name='Remove'
     ),
 
     Route(
