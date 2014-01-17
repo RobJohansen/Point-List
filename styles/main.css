@@ -17,14 +17,8 @@ i:hover {
   color:            black;
 }
 
-.points {
-  position:         relative;
-  left:             -10px;
-}
-
-.scheme {
-  position:         relative;
-  left:             10px;
+.points, .scheme {
+  margin:           0px 10px;
 }
 
 .scheme:hover {
@@ -54,6 +48,10 @@ i:hover {
   position:         relative;
   top:              -1px;
   left:             -1px;
+}
+
+.inner-pad input {
+  margin-right:     5px;
 }
 
 .pad {
