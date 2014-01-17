@@ -2,45 +2,34 @@ from google.appengine.ext import db
 from google.appengine.api import users
 
 
-def get_current_account():
-    i = users.get_current_user().user_id()
-    cs = Account().all().filter('user_id =', i)
+def current_account():
+    u = users.get_current_user()
 
-    if cs.count() == 0:
-        a = Account()
-        a.name = 'Name'
-        a.user_id = i
-        a.put()
+    if u:
+        cs = Account.all().filter('user_id =', u.user_id())
 
+        if cs.count() > 0:
+            return cs[0]
+
+        else:
+            # Create Account
+            return None
     else:
-        a = cs[0]
+        return None
 
-    return a
-
-
-def get_logout_url(uri):
+def logout_url(uri):
     return users.create_logout_url(uri)
 
-
 class UserModel(db.Model):
-    def all(cls, order=None):
-    
-        result = super(UserModel, cls).all().filter('account =', get_current_account())
+    @classmethod
+    def all(cls, **kwds):
+        return super(UserModel, cls).all(**kwds).filter('account =', current_account())
 
-        return result
-
-    # def all(cls):
-    #     a = super(UserModel, cls)
-
-    #     # a = a.all(cls)
-
-    #     # a = a
-
-    #     return a.all(cls)
 
 
 class Type(db.Model):
     name = db.StringProperty()
+
 
 class Scheme(db.Model):
     name = db.StringProperty(required=True)
@@ -57,17 +46,17 @@ class Account(db.Model):
     user_id = db.StringProperty()
 
 
-
-class Group(UserModel):
+class Group(db.Model):
     name = db.StringProperty()
     account = db.ReferenceProperty(Account, collection_name='groups')
 
+
 class Membership(UserModel):
-    name = db.StringProperty()
+    name = db.StringProperty(required=True, default='<Name>')
     scheme = db.ReferenceProperty(Scheme, collection_name='memberships')
     group = db.ReferenceProperty(Group, collection_name='memberships')
-    account = db.ReferenceProperty(Account, collection_name='memberships')
+    account = db.ReferenceProperty(Account, collection_name='memberships', default=current_account())
     username = db.StringProperty()
     password = db.StringProperty()
     points = db.StringProperty(default='0')
-    content = db.TextProperty()
+    content = db.TextProperty(default='')

@@ -18,8 +18,8 @@ def render_to_string(filename, context):
 
 def render_with_context(self, filename, context):
     context.update({
-        'auth_user' : models.get_current_account(),
-        'auth_url'  : models.get_logout_url(self.request.uri)
+        'auth_user' : models.current_account(),
+        'auth_url'  : models.logout_url(self.request.uri)
     })
 
     template = J_ENV.get_template('templates/' + filename)
@@ -31,10 +31,13 @@ def json_response(self, context):
     self.response.out.write(json.dumps(context))
 
 
+
+
+
 class Home(RequestHandler):
     def get(self):
         context = {
-            'm'         : models.Membership().all()[0]
+            'ms'        : list(sorted(models.Membership.all(), key=lambda x: x.name))
         }
 
         render_with_context(self, 'home.html', context)
@@ -42,8 +45,14 @@ class Home(RequestHandler):
 
 class Add(RequestHandler):
     def post(self):
+        s = models.Scheme.all()[0]
+
+        m = models.Membership(name=s.name)
+        m.scheme = s
+        m.put()
+
         context = {
-            'row'       : render_to_string('row.html', {'m': models.Membership().all()[1]})
+            'row'       : render_to_string('row.html', { 'm' : m })
         }
 
         json_response(self, context)
