@@ -208,7 +208,7 @@
 	"groups":
 	[
 		{
-			"selected": 4,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -224,8 +224,8 @@
 						"selection":
 						[
 							[
-								1965,
-								1965
+								1168,
+								1168
 							]
 						],
 						"settings":
@@ -236,10 +236,10 @@
 							"word_wrap": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 360.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
@@ -285,8 +285,8 @@
 						"selection":
 						[
 							[
-								387,
-								387
+								238,
+								238
 							]
 						],
 						"settings":
@@ -345,8 +345,8 @@
 						"selection":
 						[
 							[
-								2204,
-								2204
+								1876,
+								1876
 							]
 						],
 						"settings":
@@ -356,10 +356,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1068.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 1,
 					"type": "text"
 				}
 			]
