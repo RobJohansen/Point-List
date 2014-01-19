@@ -1,11 +1,11 @@
 <div class="panel panel-default">
 
-  <div class="panel-heading">
+  <div class="panel-heading" tag="{{ m.key().id() }}">
     <span class="pad">
       <i class="btn-grip fa fa-chevron-right"></i>
     </span>
 
-    <span class="pad pull-right" tag="{{ m.key().id() }}">
+    <span class="pad pull-right">
       <i class="btn-edit fa {{ 'fa-pencil' if m.username else 'fa-check' }}"></i>
 
       <i class="btn-remove fa fa-times"></i>
@@ -13,7 +13,7 @@
 
     <span class="pad view {{ 'hide' if not m.username }}">
       <span class="scheme" data-toggle="collapse" data-target="#row{{ m.key().id() }}">
-        {{ m.scheme.name }}
+        {{ m.name }}
       </span>
 
       <span class="inner-pad pull-right">
@@ -26,7 +26,7 @@
     </span>
 
     <span class="pad edit {{ 'hide' if m.username }}">
-      <input  class="form-control input-sm" type="text" placeholder="Name" value="{{ m.scheme.name }}" name="name" />
+      <input  class="form-control input-sm" type="text" placeholder="Name" value="{{ m.name }}" name="name" />
 
       <span class="inner-pad pull-right">
         <input class="form-control input-sm" type="text" placeholder="Username" value="{{ m.username or '' }}" name="username" />

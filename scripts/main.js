@@ -7,9 +7,10 @@ function add() {
     "key=" + t.closest("[tag]").attr("tag"),
     function(o) {
       var n = $(o.row);
-      setup(n);
 
+      init(n);
       n.appendTo(".rows");
+      order();
 
       t.toggleClass("fa-plus fa-refresh fa-spin");
     });
@@ -45,33 +46,59 @@ function update() {
 }
 
 
+function order() {
+  var tags = [];
+  $(".rows").find("[tag]").each(function() {
+    tags.push($(this).attr("tag"));
+  });
+
+  $.post(
+    "/order",
+    "keys=" + tags,
+    function() {
+      message("Saved");
+    });
+}
+
+
 function edit() {
   var t = $(this);
   var p = t.parent();
-  var f = p.siblings(".edit").find(".form-inline");
+  var f = p.siblings(".edit").find(":input");
 
   if (t.hasClass("fa-check")) {
     t.toggleClass("fa-check fa-refresh fa-spin");
-    f.removeClass("has-error");
+    f.parent().removeClass("has-error");
 
-    if (f.find("input").filter(function() { return this.value == ""; }).length == 0) {
+    if (f.filter(function() { return this.value == ""; }).length == 0) {
       $.post(
         "/save",
-        f.serialize() + "&key=" + p.attr("tag"),
-        function () {
+        "key=" + t.closest("[tag]").attr("tag") + "&" + f.serialize(),
+        function (o) {
+          t.closest(".panel-heading").find(".scheme").html(o.name);
           t.toggleClass("fa-pencil fa-check fa-refresh fa-spin");
           p.siblings(".edit").toggle();
           p.siblings(".view").toggle();
         });
     } else {
       t.toggleClass("fa-check fa-refresh fa-spin");
-      f.addClass("has-error");
+      f.parent().addClass("has-error");
     }
   } else {
     t.toggleClass('fa-pencil fa-check');
     p.siblings(".edit").toggle();
     p.siblings(".view").toggle();
   }
+}
+
+
+function message(m) {
+  $(".message")
+    .stop(true, true)
+    .show()
+    .html(m)
+    .delay(1000)
+    .fadeOut(1000);
 }
 
 
@@ -85,7 +112,7 @@ function b() {
 }
 
 
-function setup(n) {
+function init(n) {
   n.find(".collapse").on("show.bs.collapse", a);
   n.find(".collapse").on("hide.bs.collapse", a);
 
@@ -100,7 +127,9 @@ function setup(n) {
 
 
 $(document).ready(function() {
-  setup($(this));
+  init($(this));
+
+  $(".message").hide();
 
   $(".rows")
     .sortable({
@@ -108,7 +137,10 @@ $(document).ready(function() {
       handle      : ".btn-grip",
       start       : function(e, ui) {
                       ui.placeholder.height(ui.item.height());
-                    }
+                  },
+      stop        : function(e, ui) {
+                      order();
+                  }
     })
     .disableSelection();
 });

@@ -30,11 +30,7 @@ def get_points_bw(self, m):
     content = soup.findChildren()[1]
     points = content.div('div')[1].contents[1][2:]
 
-    # STORE
-    m.content = unicode(content)
-    m.points = unicode(points.replace(',', '').strip())
-
-    m.put()
+    return (content, points.replace(',', '').strip())
 
 
 def get_points_hh(self, m):
@@ -55,11 +51,7 @@ def get_points_hh(self, m):
     content = soup
     points = content.find(id='my_account_grid_top_middle').h2.strong.string
     
-    # STORE
-    m.content = unicode(content)
-    m.points = unicode(points.replace(',', '').strip())
-
-    m.put()
+    return (content, points.replace(',', '').strip())
 
 
 def get_points_ba(self, m):
@@ -79,12 +71,8 @@ def get_points_ba(self, m):
 
     content = soup
     points = content.findAll('span', { 'class' : 'nowrap' })[0].string[10:-2]
-    
-    # STORE
-    m.content = unicode(content)
-    m.points = unicode(points.replace(',', '').strip())
 
-    m.put()
+    return (content, points.replace(',', '').strip())
 
 
 def get_points_sb(self, m):
@@ -105,11 +93,7 @@ def get_points_sb(self, m):
     content = soup
     points = 'Not Implemented' #content.find(id='my_account_grid_top_middle').h2.strong.string.strip()
     
-    # STORE
-    m.content = unicode(content)
-    m.points = unicode(points)
-
-    m.put()
+    return (content, points)
 
 
 def get_points_co(self, m):
@@ -130,11 +114,7 @@ def get_points_co(self, m):
     content = soup
     points = content.find(id='txtCounterValueHeader').value.strip()
     
-    # STORE
-    m.content = unicode(content)
-    m.points = unicode(points)
-
-    m.put()
+    return (content, points)
 
 
 def get_points_ma(self, m):
@@ -160,18 +140,25 @@ def get_points_ma(self, m):
     content = soup
     points = 'Not Implemented' #content.find(id='my_account_grid_top_middle').h2.strong.string.strip()
     
-    # STORE
-    m.content = unicode(content)
-    m.points = unicode(points)
+    return (content, points)
 
+
+def get_error(self, m):
+    from time import sleep
+    sleep(1)
+
+    return ("?", "?")
+
+
+def updater(self, m):    
+    xs = {
+        'Best Western'      : get_points_bw,
+        'Hilton HHonors'    : get_points_hh,
+        'British Airways'   : get_points_ba,
+        'Starbucks'         : get_points_sb,
+        'Costa'             : get_points_co,
+        'Marriott Rewards'  : get_points_ma
+    }
+
+    m.content, m.points = map(unicode, xs.get('', get_error)(self, m))
     m.put()
-
-
-library = {
-    'Best Western'      : get_points_bw,
-    'Hilton HHonors'    : get_points_hh,
-    'British Airways'   : get_points_ba,
-    'Starbucks'         : get_points_sb,
-    'Costa'             : get_points_co,
-    'Marriott Rewards'  : get_points_ma
-}

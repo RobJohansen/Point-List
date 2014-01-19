@@ -1,6 +1,61 @@
 body {
+  min-width:        800px;
+  padding-top:      60px;
+}
+
+.rows,
+.message,
+.navbar-brand {
+  font-family:      'Krona One', sans-serif !important;
+}
+
+.rows {
   margin:           20px;
-  min-width:        760px;
+}
+
+.type {
+  font-style:       italic !important;
+  font-weight:      bold !important;
+  text-decoration:  underline;
+  padding-left:     10px;
+}
+
+.points,
+.scheme {
+  margin:           0px 10px;
+}
+
+.scheme:hover {
+  cursor:           pointer;
+  text-decoration:  underline;
+}
+
+.panel {
+  margin:           3px 0px;
+}
+
+.panel-heading {
+  height:           50px;
+}
+
+.placeholder {
+  margin:           3px 0px;
+  border:           1px solid #fcefa1;
+  background-color: #fbf9ee;
+  color:            #363636;
+}
+
+.pad {
+  display:          inline;
+  line-height:      30px;
+}
+
+.inner-pad {
+  display:          inline;
+}
+
+.inner-pad input {
+  margin-right:     5px;
 }
 
 i {
@@ -17,28 +72,8 @@ i:hover {
   color:            black;
 }
 
-.points, .scheme {
-  margin:           0px 10px;
-}
-
-.scheme:hover {
-  cursor:           pointer;
-  text-decoration:  underline;
-}
-
-.panel {
-  margin:           3px 0px;
-}
-
-.panel-heading {
-  height:           52px;
-}
-
-.placeholder {
-  border:           1px solid #fcefa1;
-  background-color: #fbf9ee;
-  color:            #363636;
-  margin:           3px 0px;
+.navbar i {
+  font-size:        20px;
 }
 
 .edit input {
@@ -49,69 +84,3 @@ i:hover {
   top:              -1px;
   left:             -1px;
 }
-
-.inner-pad input {
-  margin-right:     5px;
-}
-
-.pad {
-  display:          inline;
-  line-height:      30px;
-}
-
-.inner-pad {
-  display:          inline;
-}
-
-
-
-
-
-
-/*.cool-font {
-  font-family: 'Krona One', sans-serif !important;
-}*/
-
-/*
-
-
-
-
-
-
-/*
-
-.group {
-  font-style: italic;
-  font-weight: bold;
-}
-
-.group, .scheme, .points {
-  margin: 0px 15px;
-}
-
-.points {
-  font-size: 18px;
-}
-
-
-
-
-
-.header {
-  display: inline-block;
-  margin-left: 10px !important;
-
-  position: relative;
-  top: 4px;
-}
-
-
-
-.placeholder {
-  border: 1px solid #fcefa1;
-  background-color: #fbf9ee;
-  color: #363636;
-  margin: 3px 0px;
-}
-*/

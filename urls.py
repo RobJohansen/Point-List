@@ -36,7 +36,13 @@ urls = [
         r'/add',
         handler=v.Add,
         name='Add'
-    )
+    ),
+
+    Route(
+        r'/order',
+        handler=v.Order,
+        name='Order'
+    ),
 ]
 
 app = WSGIApplication(urls, debug=True)

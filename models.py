@@ -14,11 +14,14 @@ def current_account():
         else:
             # Create Account
             return None
+
     else:
         return None
 
 def logout_url(uri):
     return users.create_logout_url(uri)
+
+
 
 class UserModel(db.Model):
     @classmethod
@@ -26,13 +29,22 @@ class UserModel(db.Model):
         return super(UserModel, cls).all(**kwds).filter('account =', current_account())
 
 
+class Account(db.Model):
+    name = db.StringProperty()
+    user_id = db.StringProperty()
+    order = db.ListProperty(long)
+
+class Group(db.Model):
+    name = db.StringProperty()
+    account = db.ReferenceProperty(Account, collection_name='groups')
+
 
 class Type(db.Model):
-    name = db.StringProperty()
+    name = db.StringProperty(required=True, default='Name')
 
 
 class Scheme(db.Model):
-    name = db.StringProperty(required=True)
+    name = db.StringProperty(required=True, default='Name')
     type = db.ReferenceProperty(Type, collection_name='schemes')
     page = db.StringProperty()
     match = db.StringProperty()
@@ -41,18 +53,8 @@ class Scheme(db.Model):
     form_pass = db.StringProperty()
 
 
-class Account(db.Model):
-    name = db.StringProperty()
-    user_id = db.StringProperty()
-
-
-class Group(db.Model):
-    name = db.StringProperty()
-    account = db.ReferenceProperty(Account, collection_name='groups')
-
-
 class Membership(UserModel):
-    name = db.StringProperty(required=True, default='<Name>')
+    name = db.StringProperty(required=True, default='Name')
     scheme = db.ReferenceProperty(Scheme, collection_name='memberships')
     group = db.ReferenceProperty(Group, collection_name='memberships')
     account = db.ReferenceProperty(Account, collection_name='memberships', default=current_account())

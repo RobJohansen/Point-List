@@ -3,10 +3,7 @@ from webapp2 import RequestHandler, uri_for
 import jinja2
 import models
 import os
-import json
 import logging
-
-from getters import library
 
 J_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
@@ -27,17 +24,26 @@ def render_with_context(self, filename, context):
 
 
 def json_response(self, context):
+    import json
     self.response.headers['Content-Type'] = 'application/json'
     self.response.out.write(json.dumps(context))
 
 
 
-
-
 class Home(RequestHandler):
     def get(self):
+        from operator import attrgetter
+
+        schemes = []
+        for s in models.Scheme.all():
+            if s.memberships.count() == 0:
+                schemes.append(s)
+
+        memberships = dict(map(lambda m: (m.key().id(), m), models.Membership.all()))
+
         context = {
-            'ms'        : list(sorted(models.Membership.all(), key=lambda x: x.name))
+            'ms'        : map(lambda i: memberships.get(i), models.current_account().order),
+            'rs'        : sorted(schemes, key=attrgetter('name'))
         }
 
         render_with_context(self, 'home.html', context)
@@ -45,7 +51,8 @@ class Home(RequestHandler):
 
 class Add(RequestHandler):
     def post(self):
-        s = models.Scheme.all()[0]
+        k = long(self.request.get('key'))
+        s = models.Scheme.get_by_id(k)
 
         m = models.Membership(name=s.name)
         m.scheme = s
@@ -60,18 +67,27 @@ class Add(RequestHandler):
 
 class Remove(RequestHandler):
     def post(self):
-        context = {
-            
-        }
+        k = long(self.request.get('key'))
+        m = models.Membership.get_by_id(k)
+
+        m.delete()
+
+        context = { }
 
         json_response(self, context)
 
 
 class Update(RequestHandler):
     def get(self):
+        k = long(self.request.get('key'))
+        m = models.Membership.get_by_id(k)
+
+        from getters import updater
+        updater(self, m)
+
         context = {
-            'points'    : "0",
-            'content'   : "Hotel Information"
+            'points'    : m.points,
+            'content'   : m.content
         }
         
         json_response(self, context)
@@ -79,11 +95,29 @@ class Update(RequestHandler):
 
 class Save(RequestHandler):
     def post(self):
-        context = {
+        k = long(self.request.get('key'))
+        m = models.Membership().get_by_id(k)
 
+        m.name = self.request.get('name')
+        m.username = self.request.get('username')
+        m.password = self.request.get('password')
+        m.put()
+
+        context = {
+            'name'      : m.name
         }
         
         json_response(self, context)
+
+
+class Order(RequestHandler):
+    def post(self):
+        k = self.request.get('keys')
+
+        a = models.current_account()
+
+        a.order = map(long, k.split(','))
+        a.put()
 
 
 class Do(RequestHandler):

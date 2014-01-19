@@ -1,6 +1,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
+
     <title>Point-List</title>
     
     <link rel="stylesheet" type="text/css" href="styles/font-awesome/css/font-awesome.min.css">
@@ -18,15 +19,49 @@
   </head>
     
   <body>
-    <i class="btn-add fa fa-plus"></i>
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">
+          Point-List
+        </a>
+      </div>
 
-    <br />
+      <ul class="nav navbar-nav navbar-right">
+        <p class="navbar-text message" />
+
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <i class="fa fa-plus"></i>
+          </a>
+
+          <ul class="dropdown-menu" role="menu">
+            {% for type, ls in rs|groupby('type.name') %}
+              <li class="type">{{ type }}</li>
+
+              {% for l in ls %}
+                <li class="btn-add" tag="{{ l.key().id() }}">
+                  <a href="#">{{ l.name }}</a>
+                </li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </li>
+
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <i class="fa fa-gear"></i>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="{{ auth_url }}">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav> 
 
     <div class="rows">
       {% for m in ms %}
         {% include "templates/row.html" %}
       {% endfor %}
     </div>
-
   </body>
 </html>
