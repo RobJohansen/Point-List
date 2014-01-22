@@ -83,12 +83,26 @@ class Update(RequestHandler):
         m = models.Membership.get_by_id(k)
 
         from getters import updater
-        updater(self, m)
+        rs = updater(self, m)
 
-        context = {
-            'points'    : m.points,
-            'content'   : m.content
-        }
+        context = {}
+
+        if rs.get('success'):
+            m.content = unicode(rs.get('content'))
+            m.put()
+
+            s = models.Status(membership=m)
+            s.points = unicode(rs.get('points').replace(',', '').strip())
+            s.put()
+
+            context = {
+                'points'    : s.points,
+                'content'   : m.content
+            }
+
+        context.update({
+            'success'   : rs.get('success')
+        })
         
         json_response(self, context)
 
@@ -115,7 +129,6 @@ class Order(RequestHandler):
         k = self.request.get('keys')
 
         a = models.current_account()
-
         a.order = map(long, k.split(','))
         a.put()
 

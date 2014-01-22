@@ -1,7 +1,6 @@
 from google.appengine.ext import db
 from google.appengine.api import users
 
-
 def current_account():
     u = users.get_current_user()
 
@@ -34,6 +33,7 @@ class Account(db.Model):
     user_id = db.StringProperty()
     order = db.ListProperty(long)
 
+
 class Group(db.Model):
     name = db.StringProperty()
     account = db.ReferenceProperty(Account, collection_name='groups')
@@ -60,5 +60,21 @@ class Membership(UserModel):
     account = db.ReferenceProperty(Account, collection_name='memberships', default=current_account())
     username = db.StringProperty()
     password = db.StringProperty()
+    content = db.TextProperty()
+
+    def latest(self):
+        xs = self.statuses.order('-created')
+
+        return xs[0] if xs.count() > 0 else None
+
+    def chart_data(self):
+        from datetime import datetime
+
+        return [ [(x.created - datetime(1970, 1, 1)).total_seconds() * 1000, int(x.points)] for x in self.statuses.order('created') ]
+
+
+class Status(UserModel):
+    membership = db.ReferenceProperty(Membership, collection_name='statuses')
     points = db.StringProperty(default='0')
-    content = db.TextProperty(default='')
+    level = db.StringProperty(default='Member')
+    created = db.DateTimeProperty(auto_now_add=True)

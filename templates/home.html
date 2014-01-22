@@ -3,7 +3,7 @@
     <meta charset="utf-8" />
 
     <title>Point-List</title>
-    
+        
     <link rel="stylesheet" type="text/css" href="styles/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="styles/Krona-One.css">
     <link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css">
@@ -16,6 +16,40 @@
     <script type="text/javascript" src="scripts/bootstrap.min.js"></script>
     
     <script type="text/javascript" src="scripts/main.js"></script>
+
+    <script type="text/javascript" src="scripts/hc/highcharts.js"></script>
+    <script type="text/javascript" src="scripts/hc/modules/exporting.js"></script>
+
+  <script type="text/javascript">
+    $(function() {
+      $('.chart').highcharts({
+        legend: {
+          layout:         'vertical',
+          align:          'right',
+          verticalAlign:  'middle',
+          borderWidth:    0
+        },
+        xAxis: {
+          type: 'datetime'
+        },
+        yAxis: {
+          title: {
+            text: 'Points'
+          },
+          min: 0
+        },
+        series: [
+          {% for m in ms %}
+            {
+              name: '{{ m.name }}',
+              data: {{ m.chart_data() }}
+            },
+          {% endfor %}
+        ]
+      });
+    });
+    </script>
+
   </head>
     
   <body>
@@ -27,7 +61,11 @@
       </div>
 
       <ul class="nav navbar-nav navbar-right">
-        <p class="navbar-text message" />
+        <li class="active message">
+          <a href="#">
+            <i class="fa fa-save"></i> Saved
+          </a>
+        </li>
 
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -62,6 +100,10 @@
       {% for m in ms %}
         {% include "templates/row.html" %}
       {% endfor %}
+
+      <div class="panel panel-default">
+        <div class="chart"></div>
+      </div>
     </div>
   </body>
 </html>

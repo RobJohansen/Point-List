@@ -1,5 +1,6 @@
 from mechanize import Browser
 from bs4 import BeautifulSoup
+import logging
 
 def new_browser():
     b = Browser()
@@ -11,154 +12,191 @@ def new_browser():
     return b
 
 
-def get_points_bw(self, m):
-    # BROWSE
-    b = new_browser()
-    b.open(m.scheme.page)
+def get_points_bw(self, m, rs):
+    try:
+        # BROWSE
+        b = new_browser()
+        b.open(m.scheme.page)
 
-    b.form = list(b.forms())[0]
-    b[m.scheme.form_user] = m.username
-    b[m.scheme.form_pass] = m.password
-    b.submit()
+        b.form = list(b.forms())[0]
+        b[m.scheme.form_user] = m.username
+        b[m.scheme.form_pass] = m.password
+        b.submit()
+        
+        html = b.open('/mt/www.bestwestern.com/rewards/').read()
+        b.close()
 
-    html = b.open('/mt/www.bestwestern.com/rewards/').read()
-    b.close()
+        # TRAVERSE
+        soup = BeautifulSoup(html).find(id=m.scheme.match)
 
-    # TRAVERSE
-    soup = BeautifulSoup(html).find(id=m.scheme.match)
+        rs['content'] = soup.findChildren()[1]
+        rs['points'] = rs['content'].div('div')[1].contents[1][2:]
+        rs['success'] = True
 
-    content = soup.findChildren()[1]
-    points = content.div('div')[1].contents[1][2:]
+    except Exception, e:
+        logging.info(e)
+        rs['success'] = False
 
-    return (content, points.replace(',', '').strip())
+    finally:
+        b.close()
+
+    return rs
 
 
-def get_points_hh(self, m):
-    # BROWSE
-    b = new_browser()
-    b.open(m.scheme.page)
+def get_points_ba(self, m, rs):
+    try:
+        # BROWSE
+        b = new_browser()
+        b.open(m.scheme.page)
 
-    b.select_form(name=m.scheme.form_name)
-    b[m.scheme.form_user] = m.username
-    b[m.scheme.form_pass] = m.password
+        b.select_form(name=m.scheme.form_name)
+        b[m.scheme.form_user] = m.username
+        b[m.scheme.form_pass] = m.password
+       
+        html = b.submit().read()
+        b.close()
+
+        # TRAVERSE
+        soup = BeautifulSoup(html).find(id=m.scheme.match)
+
+        rs['content'] = soup
+        rs['points'] = rs['content'].findAll('span', { 'class' : 'nowrap' })[0].string[10:-2]
+        rs['success'] = True
+
+    except Exception, e:
+        logging.info(e)
+        rs['success'] = False
+
+    finally:
+        b.close()
+
+    return rs
+
+
+# def get_points_hh(self, m):
+#     # BROWSE
+#     b = new_browser()
+#     b.open(m.scheme.page)
+
+#     b.select_form(name=m.scheme.form_name)
+#     b[m.scheme.form_user] = m.username
+#     b[m.scheme.form_pass] = m.password
    
-    html = b.submit().read()
-    b.close()
+#     html = b.submit().read()
+#     b.close()
 
-    # TRAVERSE
-    soup = BeautifulSoup(html).find(id=m.scheme.match)
-
-    content = soup
-    points = content.find(id='my_account_grid_top_middle').h2.strong.string
+#     # TRAVERSE
+#     soup = BeautifulSoup(html).find(id=m.scheme.match)
     
-    return (content, points.replace(',', '').strip())
+#     return {
+#         'content'   : soup,
+#         'points'    : soup.find(id='my_account_grid_top_middle').h2.strong.string,
+#         'status'    : ''
+#     }
 
 
-def get_points_ba(self, m):
-    # BROWSE
-    b = new_browser()
-    b.open(m.scheme.page)
+# def get_points_sb(self, m, rs):
+#     try:
+#         # BROWSE
+#         b = new_browser()
+#         b.open(m.scheme.page)
 
-    b.select_form(name=m.scheme.form_name)
-    b[m.scheme.form_user] = m.username
-    b[m.scheme.form_pass] = m.password
-   
-    html = b.submit().read()
-    b.close()
+#         b.form = list(b.forms())[0]
+#         b[m.scheme.form_user] = m.username
+#         b[m.scheme.form_pass] = m.password
+        
+#         html = b.submit().read()
 
-    # TRAVERSE
-    soup = BeautifulSoup(html).find(id=m.scheme.match)
+#         # TRAVERSE
+#         soup = BeautifulSoup(html).find(id=m.scheme.match)
 
-    content = soup
-    points = content.findAll('span', { 'class' : 'nowrap' })[0].string[10:-2]
+#         rs['content'] = soup
+#         rs['points'] = ''
+#         rs['status'] = 'Success'
 
-    return (content, points.replace(',', '').strip())
+#     except Exception, e:
+#         rs['status'] = 'Error'
+
+#     finally:
+#         b.close()
+
+#     return rs
 
 
-def get_points_sb(self, m):
-    # BROWSE
-    b = new_browser()
-    b.open(m.scheme.page)
+# def get_points_co(self, m):
+#     # BROWSE
+#     b = new_browser()
+#     b.open(m.scheme.page)
 
-    b.form = list(b.forms())[0]
-    b[m.scheme.form_user] = m.username
-    b[m.scheme.form_pass] = m.password
+#     b.select_form(name=m.scheme.form_name)
+#     b[m.scheme.form_user] = m.username
+#     b[m.scheme.form_pass] = m.password
     
-    html = b.submit().read()
-    b.close()
+#     html = b.submit().read()
+#     b.close()
 
-    # TRAVERSE
-    soup = BeautifulSoup(html).find(id=m.scheme.match)
-
-    content = soup
-    points = 'Not Implemented' #content.find(id='my_account_grid_top_middle').h2.strong.string.strip()
+#     # TRAVERSE
+#     soup = BeautifulSoup(html).find(id=m.scheme.match)
     
-    return (content, points)
+#     return {
+#         'content'   : soup,
+#         'points'    : soup.find(id='txtCounterValueHeader').value.strip(),
+#         'status'    : ''
+#     }
 
 
-def get_points_co(self, m):
-    # BROWSE
-    b = new_browser()
-    b.open(m.scheme.page)
+# def get_points_ma(self, m):
+#     # BROWSE
+#     b = new_browser()
+#     b.open(m.scheme.page)
 
-    b.select_form(name=m.scheme.form_name)
-    b[m.scheme.form_user] = m.username
-    b[m.scheme.form_pass] = m.password
+#     b.select_form(name=m.scheme.form_name)
+#     b[m.scheme.form_user] = m.username
+#     b[m.scheme.form_pass] = m.password
+#     b.submit()
+
+#     self.response.write(b.response().read())
+
+#     b.follow_link(text_regex='Home')
+
+#     html = b.response().read()
+#     b.close()
+
+#     # TRAVERSE
+#     soup = BeautifulSoup(html).find(id=m.scheme.match)
+
+#     return {
+#         'content'   : soup,
+#         'points'    : 'Not Implemented', #content.find(id='my_account_grid_top_middle').h2.strong.string.strip()
+#         'status'    : ''
+#     }
+
+
+def get_unknown(self, m, rs):
+    rs['status'] = False
     
-    html = b.submit().read()
-    b.close()
-
-    # TRAVERSE
-    soup = BeautifulSoup(html).find(id=m.scheme.match)
-
-    content = soup
-    points = content.find(id='txtCounterValueHeader').value.strip()
-    
-    return (content, points)
-
-
-def get_points_ma(self, m):
-    # BROWSE
-    b = new_browser()
-    b.open(m.scheme.page)
-
-    b.select_form(name=m.scheme.form_name)
-    b[m.scheme.form_user] = m.username
-    b[m.scheme.form_pass] = m.password
-    b.submit()
-
-    self.response.write(b.response().read())
-
-    b.follow_link(text_regex="Home")
-
-    html = b.response().read()
-    b.close()
-
-    # TRAVERSE
-    soup = BeautifulSoup(html).find(id=m.scheme.match)
-
-    content = soup
-    points = 'Not Implemented' #content.find(id='my_account_grid_top_middle').h2.strong.string.strip()
-    
-    return (content, points)
-
-
-def get_error(self, m):
-    from time import sleep
-    sleep(1)
-
-    return ("?", "?")
+    return rs
 
 
 def updater(self, m):    
-    xs = {
-        'Best Western'      : get_points_bw,
-        'Hilton HHonors'    : get_points_hh,
-        'British Airways'   : get_points_ba,
-        'Starbucks'         : get_points_sb,
-        'Costa'             : get_points_co,
-        'Marriott Rewards'  : get_points_ma
+    # xs = {
+    #     'Hilton HHonors'    : get_points_hh,
+    #     'Starbucks'         : get_points_sb,
+    #     'Costa'             : get_points_co,
+    #     'Marriott Rewards'  : get_points_ma
+    # }
+
+    rs = {
+        'content'   : '',
+        'points'    : '',
+        'status'    : ''
     }
 
-    m.content, m.points = map(unicode, xs.get('', get_error)(self, m))
-    m.put()
+    xs = {
+        'Best Western'      : get_points_bw,
+        'British Airways'   : get_points_ba,
+    }
+
+    f = xs.get(m.scheme.name, get_unknown)
+
+    return f(self, m, rs)
