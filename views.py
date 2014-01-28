@@ -29,7 +29,6 @@ def json_response(self, context):
     self.response.out.write(json.dumps(context))
 
 
-
 class Home(RequestHandler):
     def get(self):
         from operator import attrgetter
@@ -39,11 +38,24 @@ class Home(RequestHandler):
             if s.memberships.count() == 0:
                 schemes.append(s)
 
-        memberships = dict(map(lambda m: (m.key().id(), m), models.Membership.all()))
+
+
+
+        ms = sorted(schemes, key=attrgetter('name'))
+
+        f = lambda xs: dict(map(lambda x: (x.key().id(), x), xs))
+
+        xs = f(models.Membership.all())
+        xs.update(f(models.Group.all()))
+
+        rs = map(lambda i: xs.get(i), models.current_account().order)
+
+
+
 
         context = {
-            'ms'        : map(lambda i: memberships.get(i), models.current_account().order),
-            'rs'        : sorted(schemes, key=attrgetter('name'))
+            'ms'        : ms,
+            'rs'        : rs
         }
 
         render_with_context(self, 'home.html', context)
@@ -131,7 +143,6 @@ class Order(RequestHandler):
         a = models.current_account()
         a.order = map(long, k.split(','))
         a.put()
-
 
 class Do(RequestHandler):
     def get(self):

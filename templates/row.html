@@ -1,44 +1,44 @@
 <div class="panel panel-default">
 
-  <div class="panel-heading" tag="{{ m.key().id() }}">
+  <div class="panel-heading" tag="{{ r.key().id() }}">
     <span class="pad">
       <i class="btn-grip fa fa-chevron-right"></i>
     </span>
 
     <span class="pad pull-right">
-      <i class="btn-edit fa {{ 'fa-pencil' if m.username else 'fa-check' }}"></i>
+      <i class="btn-edit fa {{ 'fa-pencil' if r.username else 'fa-check' }}"></i>
 
       <i class="btn-remove fa fa-times"></i>
     </span>
 
-    <span class="pad view {{ 'hide' if not m.username }}">
-      <span class="scheme" data-toggle="collapse" data-target="#row{{ m.key().id() }}">
-        {{ m.name }}
+    <span class="pad view {{ 'hide' if not r.username }}">
+      <span class="scheme" data-toggle="collapse" data-target="#row{{ r.key().id() }}">
+        {{ r.name }}
       </span>
 
       <span class="inner-pad pull-right">
         <span class="points">
-          {{ m.latest().points }}
+          {{ r.latest().points }}
         </span>
 
         <i class="btn-update fa fa-refresh"></i>&nbsp;
       </span>
     </span>
 
-    <span class="pad edit {{ 'hide' if m.username }}">
-      <input  class="form-control input-sm" type="text" placeholder="Name" value="{{ m.name }}" name="name" />
+    <span class="pad edit {{ 'hide' if r.username }}">
+      <input  class="form-control input-sm" type="text" placeholder="Name" value="{{ r.name }}" name="name" />
 
       <span class="inner-pad pull-right">
-        <input class="form-control input-sm" type="text" placeholder="Username" value="{{ m.username or '' }}" name="username" />
+        <input class="form-control input-sm" type="text" placeholder="Username" value="{{ r.username or '' }}" name="username" />
 
-        <input class="form-control input-sm"  type="password" placeholder="Password" value="{{ m.password or '' }}" name="password" />
+        <input class="form-control input-sm"  type="password" placeholder="Password" value="{{ r.password or '' }}" name="password" />
       </span>
     </span>
   </div>
 
-  <div class="collapse" id="row{{ m.key().id() }}">
+  <div class="collapse" id="row{{ r.key().id() }}">
     <div class="panel-body">
-      {{ m.content|safe }}
+      {{ r.content|safe }}
     </div>
   </div>
 

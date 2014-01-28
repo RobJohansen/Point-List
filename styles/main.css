@@ -16,7 +16,6 @@ body {
 .type {
   font-style:       italic !important;
   font-weight:      bold !important;
-  text-decoration:  underline;
   padding-left:     10px;
 }
 

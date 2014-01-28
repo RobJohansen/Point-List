@@ -107,7 +107,7 @@ function remove() {
 
 function order() {
   var tags = [];
-  $(".rows").find("[tag]").each(function() {
+  $(".rows > * > [tag]").each(function() {
     tags.push($(this).attr("tag"));
   });
 

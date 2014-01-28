@@ -34,7 +34,7 @@ class Account(db.Model):
     order = db.ListProperty(long)
 
 
-class Group(db.Model):
+class Group(UserModel):
     name = db.StringProperty()
     account = db.ReferenceProperty(Account, collection_name='groups')
 

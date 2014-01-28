@@ -20,34 +20,36 @@
     <script type="text/javascript" src="scripts/hc/highcharts.js"></script>
     <script type="text/javascript" src="scripts/hc/modules/exporting.js"></script>
 
-  <script type="text/javascript">
-    $(function() {
-      $('.chart').highcharts({
-        legend: {
-          layout:         'vertical',
-          align:          'right',
-          verticalAlign:  'middle',
-          borderWidth:    0
-        },
-        xAxis: {
-          type: 'datetime'
-        },
-        yAxis: {
-          title: {
-            text: 'Points'
+    <script type="text/javascript">
+      $(function() {
+        $('.chart').highcharts({
+          legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
           },
-          min: 0
-        },
-        series: [
-          {% for m in ms %}
-            {
-              name: '{{ m.name }}',
-              data: {{ m.chart_data() }}
+          xAxis: {
+            type: 'datetime'
+          },
+          yAxis: {
+            title: {
+              text: 'Points'
             },
-          {% endfor %}
-        ]
+            min: 0
+          },
+          series: [
+            {% for r in rs %}
+              {% if r.kind() == 'Membership' %}
+                {
+                  name: '{{ r.name }}',
+                  data: {{ r.chart_data() }}
+                },
+              {% endif %}
+            {% endfor %}
+          ]
+        });
       });
-    });
     </script>
 
   </head>
@@ -73,7 +75,7 @@
           </a>
 
           <ul class="dropdown-menu" role="menu">
-            {% for type, ls in rs|groupby('type.name') %}
+            {% for type, ls in ms|groupby('type.name') %}
               <li class="type">{{ type }}</li>
 
               {% for l in ls %}
@@ -94,11 +96,15 @@
           </ul>
         </li>
       </ul>
-    </nav> 
+    </nav>
 
     <div class="rows">
-      {% for m in ms %}
-        {% include "templates/row.html" %}
+      {% for r in rs %}
+        {% if r.kind() == 'Membership' %}
+          {% include "templates/row.html" %}
+        {% else %}
+          {% include "templates/group.html" %}
+        {% endif %}
       {% endfor %}
 
       <div class="panel panel-default">
