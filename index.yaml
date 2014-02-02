@@ -12,6 +12,25 @@ indexes:
 
 - kind: Status
   properties:
+  - name: account
+  - name: created
+    direction: desc
+
+- kind: Status
+  properties:
+  - name: account
+  - name: membership
+  - name: created
+
+- kind: Status
+  properties:
+  - name: account
+  - name: membership
+  - name: created
+    direction: desc
+
+- kind: Status
+  properties:
   - name: membership
   - name: created
 

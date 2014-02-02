@@ -1,14 +1,15 @@
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 from google.appengine.api import users
+import logging
 
 def current_account():
     u = users.get_current_user()
 
     if u:
-        cs = Account.all().filter('user_id =', u.user_id())
+        cs = Account.query(Account.user_id == u.user_id())
 
         if cs.count() > 0:
-            return cs[0]
+            return cs.get()
 
         else:
             # Create Account
@@ -21,60 +22,83 @@ def logout_url(uri):
     return users.create_logout_url(uri)
 
 
+class Account(ndb.Model):
+    name = ndb.StringProperty()
+    user_id = ndb.StringProperty()
+    order = ndb.IntegerProperty(repeated=True)
 
-class UserModel(db.Model):
+    @property
+    def groups(self):
+        return Group.query(Group.account == self.key)
+
+    @property
+    def memberships(self):
+        return Membership.query(Membership.account == self.key)
+
+
+class UserModel(ndb.Model):
+    account = ndb.KeyProperty(Account, default=current_account())
+
     @classmethod
-    def all(cls, **kwds):
-        return super(UserModel, cls).all(**kwds).filter('account =', current_account())
-
-
-class Account(db.Model):
-    name = db.StringProperty()
-    user_id = db.StringProperty()
-    order = db.ListProperty(long)
+    def query(cls, *args, **kwds):
+        return super(UserModel, cls).query(UserModel.account == current_account().key, *args, **kwds)
 
 
 class Group(UserModel):
-    name = db.StringProperty()
-    account = db.ReferenceProperty(Account, collection_name='groups')
+    name = ndb.StringProperty(required=True)
+
+    @property
+    def memberships(self):
+        return Membership.query(Membership.group == self.key)
 
 
-class Type(db.Model):
-    name = db.StringProperty(required=True, default='Name')
+class Type(ndb.Model):
+    name = ndb.StringProperty(required=True)
+    
+    @property
+    def schemes(self):
+        return Scheme.query(Scheme.type == self.key)
 
 
-class Scheme(db.Model):
-    name = db.StringProperty(required=True, default='Name')
-    type = db.ReferenceProperty(Type, collection_name='schemes')
-    page = db.StringProperty()
-    match = db.StringProperty()
-    form_name = db.StringProperty()
-    form_user = db.StringProperty()
-    form_pass = db.StringProperty()
+class Scheme(ndb.Model):
+    name = ndb.StringProperty(required=True, default='Name')
+    type = ndb.KeyProperty(Type)
+    page = ndb.StringProperty()
+    match = ndb.StringProperty()
+    form_name = ndb.StringProperty()
+    form_user = ndb.StringProperty()
+    form_pass = ndb.StringProperty()
+
+    @property
+    def memberships(self):
+        return Membership.query(Membership.scheme == self.key)
 
 
 class Membership(UserModel):
-    name = db.StringProperty(required=True, default='Name')
-    scheme = db.ReferenceProperty(Scheme, collection_name='memberships')
-    group = db.ReferenceProperty(Group, collection_name='memberships')
-    account = db.ReferenceProperty(Account, collection_name='memberships', default=current_account())
-    username = db.StringProperty()
-    password = db.StringProperty()
-    content = db.TextProperty()
+    name = ndb.StringProperty(required=True, default='Name')
+    scheme = ndb.KeyProperty(Scheme)
+    group = ndb.KeyProperty(Group)
+    username = ndb.StringProperty()
+    password = ndb.StringProperty()
+    content = ndb.TextProperty()
 
+    @property
+    def statuses(self):
+        return Status.query(Status.membership == self.key)
+
+    @property
     def latest(self):
-        xs = self.statuses.order('-created')
-
-        return xs[0] if xs.count() > 0 else None
+        return self.statuses.order(-Status.created).get()
 
     def chart_data(self):
         from datetime import datetime
+        default = datetime(1970, 1, 1)
 
-        return [ [(x.created - datetime(1970, 1, 1)).total_seconds() * 1000, int(x.points)] for x in self.statuses.order('created') ]
+        return map(lambda x: [(x.created - default).total_seconds() * 1000, int(x.points)], self.statuses.order(Status.created))
 
 
-class Status(UserModel):
-    membership = db.ReferenceProperty(Membership, collection_name='statuses')
-    points = db.StringProperty(default='0')
-    level = db.StringProperty(default='Member')
-    created = db.DateTimeProperty(auto_now_add=True)
+class Status(ndb.Model):
+    membership = ndb.KeyProperty(Membership)
+    points = ndb.StringProperty(default='0')
+    level = ndb.StringProperty(default='Member')
+    created = ndb.DateTimeProperty(auto_now_add=True)

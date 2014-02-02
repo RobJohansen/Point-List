@@ -1,6 +1,6 @@
 <div class="panel panel-default">
 
-  <div class="panel-heading" tag="{{ r.key().id() }}">
+  <div class="panel-heading" tag="{{ r.key.id() }}">
     <span class="pad">
       <i class="btn-grip fa fa-chevron-right"></i>
     </span>
@@ -12,13 +12,13 @@
     </span>
 
     <span class="pad view {{ 'hide' if not r.username }}">
-      <span class="scheme" data-toggle="collapse" data-target="#row{{ r.key().id() }}">
+      <span class="scheme" data-toggle="collapse" data-target="#row{{ r.key.id() }}">
         {{ r.name }}
       </span>
 
       <span class="inner-pad pull-right">
         <span class="points">
-          {{ r.latest().points }}
+          {{ r.latest.points }}
         </span>
 
         <i class="btn-update fa fa-refresh"></i>&nbsp;
@@ -36,7 +36,7 @@
     </span>
   </div>
 
-  <div class="collapse" id="row{{ r.key().id() }}">
+  <div class="collapse" id="row{{ r.key.id() }}">
     <div class="panel-body">
       {{ r.content|safe }}
     </div>

@@ -40,7 +40,7 @@
           },
           series: [
             {% for r in rs %}
-              {% if r.kind() == 'Membership' %}
+              {% if r.key.kind() == 'Membership' %}
                 {
                   name: '{{ r.name }}',
                   data: {{ r.chart_data() }}
@@ -75,11 +75,11 @@
           </a>
 
           <ul class="dropdown-menu" role="menu">
-            {% for type, ls in ms|groupby('type.name') %}
-              <li class="type">{{ type }}</li>
+            {% for type, ls in ms|groupby('type') %}
+              <li class="type">{{ type.get().name }}</li>
 
               {% for l in ls %}
-                <li class="btn-add" tag="{{ l.key().id() }}">
+                <li class="btn-add" tag="{{ l.key.id() }}">
                   <a href="#">{{ l.name }}</a>
                 </li>
               {% endfor %}
@@ -100,7 +100,7 @@
 
     <div class="rows">
       {% for r in rs %}
-        {% if r.kind() == 'Membership' %}
+        {% if r.key.kind() == 'Membership' %}
           {% include "templates/row.html" %}
         {% else %}
           {% include "templates/group.html" %}

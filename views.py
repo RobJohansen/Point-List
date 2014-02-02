@@ -34,7 +34,7 @@ class Home(RequestHandler):
         from operator import attrgetter
 
         schemes = []
-        for s in models.Scheme.all():
+        for s in models.Scheme.query():
             if s.memberships.count() == 0:
                 schemes.append(s)
 
@@ -43,10 +43,10 @@ class Home(RequestHandler):
 
         ms = sorted(schemes, key=attrgetter('name'))
 
-        f = lambda xs: dict(map(lambda x: (x.key().id(), x), xs))
+        f = lambda xs: dict(map(lambda x: (x.key.id(), x), xs))
 
-        xs = f(models.Membership.all())
-        xs.update(f(models.Group.all()))
+        xs = f(models.Membership.query())
+        xs.update(f(models.Group.query()))
 
         rs = map(lambda i: xs.get(i), models.current_account().order)
 
@@ -82,7 +82,7 @@ class Remove(RequestHandler):
         k = long(self.request.get('key'))
         m = models.Membership.get_by_id(k)
 
-        m.delete()
+        m.key.delete()
 
         context = { }
 
