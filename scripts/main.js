@@ -108,12 +108,22 @@ function remove() {
 function order() {
   var tags = [];
   $(".rows > * > [tag]").each(function() {
-    tags.push($(this).attr("tag"));
+    var t = $(this);
+
+    if (!t.parent().hasClass("row")) {
+      var subtags = []
+      t.parent().find("[tag]").each(function() {
+        subtags.push($(this).attr("tag"));
+      });
+      tags.push(subtags);
+    }
+    
+    tags.push(t.attr("tag"));
   });
 
   $.post(
     "/order",
-    "keys=" + tags,
+    "keys=" + JSON.stringify(tags),
     function() {
       $(".message")
         .stop(true, true)

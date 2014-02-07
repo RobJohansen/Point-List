@@ -1,4 +1,4 @@
-<div class="panel panel-default">
+<div class="panel panel-default row">
 
   <div class="panel-heading" tag="{{ r.key.id() }}">
     <span class="pad">
@@ -13,7 +13,7 @@
 
     <span class="pad view {{ 'hide' if not r.username }}">
       <span class="scheme" data-toggle="collapse" data-target="#row{{ r.key.id() }}">
-        {{ r.name }}
+        {{ r.verbose_name }}
       </span>
 
       <span class="inner-pad pull-right">
@@ -26,7 +26,7 @@
     </span>
 
     <span class="pad edit {{ 'hide' if r.username }}">
-      <input  class="form-control input-sm" type="text" placeholder="Name" value="{{ r.name }}" name="name" />
+      <input  class="form-control input-sm" type="text" placeholder="Name" value="{{ r.verbose_name }}" name="name" />
 
       <span class="inner-pad pull-right">
         <input class="form-control input-sm" type="text" placeholder="Username" value="{{ r.username or '' }}" name="username" />

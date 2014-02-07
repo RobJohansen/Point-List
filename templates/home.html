@@ -21,35 +21,35 @@
     <script type="text/javascript" src="scripts/hc/modules/exporting.js"></script>
 
     <script type="text/javascript">
-      $(function() {
-        $('.chart').highcharts({
-          legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle',
-            borderWidth: 0
-          },
-          xAxis: {
-            type: 'datetime'
-          },
-          yAxis: {
-            title: {
-              text: 'Points'
-            },
-            min: 0
-          },
-          series: [
-            {% for r in rs %}
-              {% if r.key.kind() == 'Membership' %}
-                {
-                  name: '{{ r.name }}',
-                  data: {{ r.chart_data() }}
-                },
-              {% endif %}
-            {% endfor %}
-          ]
-        });
-      });
+    //   $(function() {
+    //     $('.chart').highcharts({
+    //       legend: {
+    //         layout: 'vertical',
+    //         align: 'right',
+    //         verticalAlign: 'middle',
+    //         borderWidth: 0
+    //       },
+    //       xAxis: {
+    //         type: 'datetime'
+    //       },
+    //       yAxis: {
+    //         title: {
+    //           text: 'Points'
+    //         },
+    //         min: 0
+    //       },
+    //       series: [
+    //         {% for r in rs %}
+    //           {% if r.key.kind() == 'Membership' %}
+    //             {
+    //               name: '{{ r.name }}',
+    //               data: {{ r.chart_data() }}
+    //             },
+    //           {% endif %}
+    //         {% endfor %}
+    //       ]
+    //     });
+    //   });
     </script>
 
   </head>
@@ -107,9 +107,9 @@
         {% endif %}
       {% endfor %}
 
-      <div class="panel panel-default">
+<!--       <div class="panel panel-default">
         <div class="chart"></div>
-      </div>
+      </div> -->
     </div>
   </body>
 </html>

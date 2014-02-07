@@ -4,6 +4,7 @@ import jinja2
 import models
 import os
 import logging
+import json
 
 J_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
@@ -24,7 +25,6 @@ def render_with_context(self, filename, context):
 
 
 def json_response(self, context):
-    import json
     self.response.headers['Content-Type'] = 'application/json'
     self.response.out.write(json.dumps(context))
 
@@ -48,7 +48,7 @@ class Home(RequestHandler):
         xs = f(models.Membership.query())
         xs.update(f(models.Group.query()))
 
-        rs = map(lambda i: xs.get(i), models.current_account().order)
+        rs = filter(lambda x: x is not None, map(lambda i: xs.get(i), models.current_account().order))
 
 
 
@@ -66,12 +66,12 @@ class Add(RequestHandler):
         k = long(self.request.get('key'))
         s = models.Scheme.get_by_id(k)
 
-        m = models.Membership(name=s.name)
-        m.scheme = s
+        m = models.Membership()
+        m.scheme = s.key
         m.put()
 
         context = {
-            'row'       : render_to_string('row.html', { 'm' : m })
+            'row'       : render_to_string('row.html', { 'r' : m })
         }
 
         json_response(self, context)
@@ -140,9 +140,21 @@ class Order(RequestHandler):
     def post(self):
         k = self.request.get('keys')
 
+        rs = []
+
+        for r in json.loads(k):
+            if isinstance(r, (list)):
+                g = models.Group.query().get()
+                g.order = map(long, r[1:])
+                g.put()
+
+            else:
+                rs.append(r)
+        
         a = models.current_account()
-        a.order = map(long, k.split(','))
+        a.order = map(long, rs)
         a.put()
+
 
 class Do(RequestHandler):
     def get(self):

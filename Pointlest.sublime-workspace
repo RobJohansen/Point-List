@@ -55,7 +55,7 @@
 			"file": "templates/home.html",
 			"settings":
 			{
-				"buffer_size": 3309,
+				"buffer_size": 3405,
 				"line_ending": "Windows"
 			}
 		},
@@ -63,7 +63,7 @@
 			"file": "templates/row.html",
 			"settings":
 			{
-				"buffer_size": 1378,
+				"buffer_size": 1398,
 				"line_ending": "Windows"
 			}
 		},
@@ -71,7 +71,7 @@
 			"file": "templates/group.html",
 			"settings":
 			{
-				"buffer_size": 854,
+				"buffer_size": 857,
 				"line_ending": "Windows"
 			}
 		},
@@ -87,15 +87,18 @@
 			"file": "scripts/main.js",
 			"settings":
 			{
-				"buffer_size": 7770,
+				"buffer_size": 7931,
 				"line_ending": "Windows"
 			}
 		},
 		{
+			"contents": "from webapp2 import RequestHandler, uri_for\n\nimport jinja2\nimport models\nimport os\nimport logging\n\nJ_ENV = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))\n\n\ndef render_to_string(filename, context):\n    template = J_ENV.get_template('templates/' + filename)\n    return template.render(context)\n\n\ndef render_with_context(self, filename, context):\n    context.update({\n        'auth_user' : models.current_account(),\n        'auth_url'  : models.logout_url(self.request.uri)\n    })\n\n    template = J_ENV.get_template('templates/' + filename)\n    self.response.out.write(template.render(context))\n\n\ndef json_response(self, context):\n    import json\n    self.response.headers['Content-Type'] = 'application/json'\n    self.response.out.write(json.dumps(context))\n\n\nclass Home(RequestHandler):\n    def get(self):\n        from operator import attrgetter\n\n        schemes = []\n        for s in models.Scheme.query():\n            if s.memberships.count() == 0:\n                schemes.append(s)\n\n\n\n\n        ms = sorted(schemes, key=attrgetter('name'))\n\n        f = lambda xs: dict(map(lambda x: (x.key.id(), x), xs))\n\n        xs = f(models.Membership.query())\n        xs.update(f(models.Group.query()))\n\n        rs = filter(lambda x: x is not None, map(lambda i: xs.get(i), models.current_account().order))\n\n\n\n\n        context = {\n            'ms'        : ms,\n            'rs'        : rs\n        }\n\n        render_with_context(self, 'home.html', context)\n\n\nclass Add(RequestHandler):\n    def post(self):\n        k = long(self.request.get('key'))\n        s = models.Scheme.get_by_id(k)\n\n        m = models.Membership()\n        m.scheme = s.key\n        m.put()\n\n        context = {\n            'row'       : render_to_string('row.html', { 'r' : m })\n        }\n\n        json_response(self, context)\n\n\nclass Remove(RequestHandler):\n    def post(self):\n        k = long(self.request.get('key'))\n        m = models.Membership.get_by_id(k)\n\n        m.key.delete()\n\n        context = { }\n\n        json_response(self, context)\n\n\nclass Update(RequestHandler):\n    def get(self):\n        k = long(self.request.get('key'))\n        m = models.Membership.get_by_id(k)\n\n        from getters import updater\n        rs = updater(self, m)\n\n        context = {}\n\n        if rs.get('success'):\n            m.content = unicode(rs.get('content'))\n            m.put()\n\n            s = models.Status(membership=m)\n            s.points = unicode(rs.get('points').replace(',', '').strip())\n            s.put()\n\n            context = {\n                'points'    : s.points,\n                'content'   : m.content\n            }\n\n        context.update({\n            'success'   : rs.get('success')\n        })\n        \n        json_response(self, context)\n\n\nclass Save(RequestHandler):\n    def post(self):\n        k = long(self.request.get('key'))\n        m = models.Membership().get_by_id(k)\n\n        m.name = self.request.get('name')\n        m.username = self.request.get('username')\n        m.password = self.request.get('password')\n        m.put()\n\n        context = {\n            'name'      : m.name\n        }\n        \n        json_response(self, context)\n\n\nclass Order(RequestHandler):\n    def post(self):\n        k = self.request.get('keys')\n\n        logging.info()\n\n        xs = map(long, k.split(','))\n\n        \n\n        #map(models.Group.get_by_id, xs), map(models.Membership.get_by_id, xs)\n\n        #a = models.current_account()\n        #a.order = \n        #a.put()\n\n\nclass Do(RequestHandler):\n    def get(self):\n        self.response.out.write('Done')",
 			"file": "views.py",
+			"file_size": 3536,
+			"file_write_time": 130361821603432513,
 			"settings":
 			{
-				"buffer_size": 3401,
+				"buffer_size": 3560,
 				"line_ending": "Unix"
 			}
 		},
@@ -103,7 +106,7 @@
 			"file": "models.py",
 			"settings":
 			{
-				"buffer_size": 2701,
+				"buffer_size": 2924,
 				"line_ending": "Windows"
 			}
 		},
@@ -246,7 +249,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 5,
 			"sheets":
 			[
 				{
@@ -255,15 +258,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3309,
+						"buffer_size": 3405,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1906,
-								1906
+								2173,
+								2173
 							]
 						],
 						"settings":
@@ -273,10 +276,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 795.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
@@ -285,15 +288,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1378,
+						"buffer_size": 1398,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								624,
-								624
+								91,
+								91
 							]
 						],
 						"settings":
@@ -306,7 +309,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
@@ -315,15 +318,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 854,
+						"buffer_size": 857,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								466,
-								466
+								647,
+								647
 							]
 						],
 						"settings":
@@ -336,7 +339,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
@@ -352,8 +355,8 @@
 						"selection":
 						[
 							[
-								891,
-								891
+								727,
+								727
 							]
 						],
 						"settings":
@@ -362,11 +365,11 @@
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.x": -0.0,
+						"translation.y": 585.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
@@ -375,15 +378,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7770,
+						"buffer_size": 7931,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3621,
-								3621
+								2585,
+								2585
 							]
 						],
 						"settings":
@@ -393,10 +396,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2055.0,
+						"translation.y": 1440.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
@@ -405,15 +408,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3401,
+						"buffer_size": 3560,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1953,
-								1953
+								3246,
+								3246
 							]
 						],
 						"settings":
@@ -423,10 +426,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 585.0,
+						"translation.y": 1755.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
@@ -435,15 +438,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2701,
+						"buffer_size": 2924,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2351,
-								2331
+								1945,
+								1945
 							]
 						],
 						"settings":
@@ -452,11 +455,11 @@
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": -0.0,
-						"translation.y": 999.0,
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
@@ -472,8 +475,8 @@
 						"selection":
 						[
 							[
-								667,
-								667
+								4393,
+								4393
 							]
 						],
 						"settings":
@@ -482,8 +485,8 @@
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.x": -0.0,
+						"translation.y": 2462.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 7,
