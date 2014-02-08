@@ -7,17 +7,11 @@ def current_account():
     u = users.get_current_user()
 
     if u:
-        cs = Account.query(Account.user_id == u.user_id())
-
-        return cs.get()
+        return Account.query(Account.user_id == u.user_id()).get() or Account().put().get()             # Adds two :)
 
     else:
         return None
 
-def current_account_key():
-    c = current_account()
-
-    return None if not c else c.key
 
 def logout_url(uri):
     return users.create_logout_url(uri)
@@ -28,31 +22,16 @@ class Account(ndb.Model):
     user_id = ndb.StringProperty()
     order = ndb.IntegerProperty(repeated=True)
 
-    @property
-    def groups(self):
-        return Group.query(Group.account == self.key)
-
-    @property
-    def memberships(self):
-        return Membership.query(Membership.account == self.key)
-
-
-# class UserModel(ndb.Model):
-#     account = ndb.KeyProperty(Account, default=current_account_key())
-
-#     @classmethod
-#     def all(cls, *args, **kwds):
-#         return super(UserModel, cls).query(*args, **kwds)
-
-#     @classmethod
-#     def query(cls, *args, **kwds):
-#         return super(UserModel, cls).query(UserModel.account == current_account_key(), *args, **kwds)
-
+    def rows(self):
+        return filter(lambda x: x is not None, [Group.get_by_id(r) or Membership.get_by_id(r)  for r in self.order])
 
 
 class Group(ndb.Model):
-    name = ndb.StringProperty(required=True)
+    name = ndb.StringProperty(required=True, default="New Group")
     order = ndb.IntegerProperty(repeated=True)
+
+    def rows(self):
+        return filter(lambda x: x is not None, [Membership.get_by_id(r) for r in self.order])
 
 
 class Type(ndb.Model):

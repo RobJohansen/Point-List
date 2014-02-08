@@ -39,23 +39,9 @@ class Home(RequestHandler):
                 schemes.append(s)
 
 
-
-
-        ms = sorted(schemes, key=attrgetter('name'))
-
-        f = lambda xs: dict(map(lambda x: (x.key.id(), x), xs))
-
-        xs = f(models.Membership.query())
-        xs.update(f(models.Group.query()))
-
-        rs = filter(lambda x: x is not None, map(lambda i: xs.get(i), models.current_account().order))
-
-
-
-
         context = {
-            'ms'        : ms,
-            'rs'        : rs
+            'ms'        : sorted(schemes, key=attrgetter('name')),
+            'a'         : models.current_account()
         }
 
         render_with_context(self, 'home.html', context)
@@ -71,7 +57,19 @@ class Add(RequestHandler):
         m.put()
 
         context = {
-            'row'       : render_to_string('row.html', { 'r' : m })
+            'node'      : render_to_string('row.html', { 'r' : m })
+        }
+
+        json_response(self, context)
+
+
+class AddGroup(RequestHandler):
+    def post(self):
+        m = models.Group()
+        m.put()
+
+        context = {
+            'node'      : render_to_string('group.html', { 'r' : m })
         }
 
         json_response(self, context)
@@ -80,7 +78,7 @@ class Add(RequestHandler):
 class Remove(RequestHandler):
     def post(self):
         k = long(self.request.get('key'))
-        m = models.Membership.get_by_id(k)
+        m = models.Membership.get_by_id(k) or models.Group.get_by_id(k)
 
         m.key.delete()
 
@@ -122,11 +120,14 @@ class Update(RequestHandler):
 class Save(RequestHandler):
     def post(self):
         k = long(self.request.get('key'))
-        m = models.Membership().get_by_id(k)
+        m = models.Membership().get_by_id(k) or models.Group.get_by_id(k)
 
         m.name = self.request.get('name')
-        m.username = self.request.get('username')
-        m.password = self.request.get('password')
+        
+        if m.key.kind() == 'Membership':
+            m.username = self.request.get('username')
+            m.password = self.request.get('password')
+            
         m.put()
 
         context = {
@@ -143,8 +144,8 @@ class Order(RequestHandler):
         rs = []
 
         for r in json.loads(k):
-            if isinstance(r, (list)):
-                g = models.Group.query().get()
+            if isinstance(r, list):
+                g = models.Group.get_by_id(long(r[0]))
                 g.order = map(long, r[1:])
                 g.put()
 

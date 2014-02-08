@@ -14,6 +14,7 @@
     <script type="text/javascript" src="scripts/jquery-1.9.1.js"></script>
     <script type="text/javascript" src="scripts/jquery-ui.js"></script>
     <script type="text/javascript" src="scripts/bootstrap.min.js"></script>
+    <script type="text/javascript" src="scripts/bootbox.min.js"></script>
     
     <script type="text/javascript" src="scripts/main.js"></script>
 
@@ -63,9 +64,9 @@
       </div>
 
       <ul class="nav navbar-nav navbar-right">
-        <li class="active message">
+        <li class="active message hide">
           <a href="#">
-            <i class="fa fa-save"></i> Saved
+            <i class="fa fa-upload"></i>
           </a>
         </li>
 
@@ -75,7 +76,11 @@
           </a>
 
           <ul class="dropdown-menu" role="menu">
+            <li class="btn-add-group">
+              <a href="#"></i>Group</a>
+            </li>
             {% for type, ls in ms|groupby('type') %}
+              <li class="divider"></li>
               <li class="type">{{ type.get().name }}</li>
 
               {% for l in ls %}
@@ -98,18 +103,22 @@
       </ul>
     </nav>
 
-    <div class="rows">
-      {% for r in rs %}
-        {% if r.key.kind() == 'Membership' %}
-          {% include "templates/row.html" %}
-        {% else %}
-          {% include "templates/group.html" %}
-        {% endif %}
-      {% endfor %}
+    <div class="main">
+      <div class="rows">
+        {% for r in a.rows() %}
+          {% if r.key.kind() == 'Membership' %}
+            {% set sub = false %}
+            {% include "templates/row.html" %}
+          {% else %}
+            {% set sub = true %}
+            {% include "templates/group.html" %}
+          {% endif %}
+        {% endfor %}
 
-<!--       <div class="panel panel-default">
-        <div class="chart"></div>
-      </div> -->
+  <!--       <div class="panel panel-default">
+          <div class="chart"></div>
+        </div> -->
+      </div>
     </div>
   </body>
 </html>

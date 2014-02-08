@@ -24,9 +24,11 @@
 
   <div class="collapse in" id="group{{ r.key.id() }}">
     <div class="panel-body">
-      {% for r in r.memberships %}
-        {% include "templates/row.html" %}
-      {% endfor %}
+      <div class="rows">
+        {% for r in r.rows() %}
+          {% include "templates/row.html" %}
+        {% endfor %}
+      </div>
     </div>
   </div>
 

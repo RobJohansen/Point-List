@@ -197,6 +197,6 @@ def updater(self, m):
         'British Airways'   : get_points_ba,
     }
 
-    f = xs.get(m.scheme.name, get_unknown)
+    f = xs.get(m.scheme.get().name, get_unknown)
 
     return f(self, m, rs)

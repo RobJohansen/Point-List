@@ -39,6 +39,12 @@ urls = [
     ),
 
     Route(
+        r'/add_group',
+        handler=v.AddGroup,
+        name='AddGroup'
+    ),
+
+    Route(
         r'/order',
         handler=v.Order,
         name='Order'
