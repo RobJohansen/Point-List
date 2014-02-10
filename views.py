@@ -15,8 +15,11 @@ def render_to_string(filename, context):
 
 
 def render_with_context(self, filename, context):
+    from google.appengine.api import users
+
     context.update({
-        'auth_user' : models.current_account(),
+        'auth_user' : users.get_current_user(),
+        'auth_acct' : models.current_account(),
         'auth_url'  : models.logout_url(self.request.uri)
     })
 
@@ -29,22 +32,34 @@ def json_response(self, context):
     self.response.out.write(json.dumps(context))
 
 
+def menu_items():
+    from operator import attrgetter
+
+    schemes = []
+    for s in models.Scheme.query():
+        if s.memberships.count() == 0:
+            schemes.append(s)
+
+    return sorted(schemes, key=attrgetter('name'))
+
+
+
 class Home(RequestHandler):
     def get(self):
-        from operator import attrgetter
-
-        schemes = []
-        for s in models.Scheme.query():
-            if s.memberships.count() == 0:
-                schemes.append(s)
-
-
         context = {
-            'ms'        : sorted(schemes, key=attrgetter('name')),
-            'a'         : models.current_account()
+            'ms'        : menu_items()
         }
 
         render_with_context(self, 'home.html', context)
+
+
+class Menu(RequestHandler):
+    def get(self):
+        context = {
+            'menu'      : render_to_string('menu.html', { 'ms' : menu_items() })
+        }
+
+        json_response(self, context)
 
 
 class Add(RequestHandler):
@@ -75,6 +90,7 @@ class AddGroup(RequestHandler):
         json_response(self, context)
 
 
+
 class Remove(RequestHandler):
     def post(self):
         k = long(self.request.get('key'))
@@ -82,7 +98,7 @@ class Remove(RequestHandler):
 
         m.key.delete()
 
-        context = { }
+        context = {}
 
         json_response(self, context)
 
@@ -101,7 +117,7 @@ class Update(RequestHandler):
             m.content = unicode(rs.get('content'))
             m.put()
 
-            s = models.Status(membership=m)
+            s = models.Status(membership=m.key)
             s.points = unicode(rs.get('points').replace(',', '').strip())
             s.put()
 

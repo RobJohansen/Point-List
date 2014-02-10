@@ -1,0 +1,15 @@
+<li class="btn-add-group">
+  <a href="#"><i class="fa fa-th-list"></i>&nbsp;&nbsp;Group</a>
+</li>
+{% for type, ls in ms|groupby('type') %}
+  <li class="divider"></li>
+  <li class="type">
+    {{ type.get().name }}
+  </li>
+
+  {% for l in ls %}
+    <li class="btn-add" tag="{{ l.key.id() }}">
+      <a href="#">{{ l.name }}</a>
+    </li>
+  {% endfor %}
+{% endfor %}

@@ -1,3 +1,15 @@
+<script type="text/javascript">
+  $(function() {
+    $('#chart{{ r.key.id() }}').highcharts({
+      series: [{
+        showInLegend: false,
+        name: '{{ r.name }}',
+        data: {{ r.chart_data() }}
+      }]
+    });
+  });
+</script>
+
 <div class="panel panel-default row">
 
   <div class="panel-heading" tag="{{ r.key.id() }}">
@@ -41,6 +53,8 @@
   <div class="collapse" id="row{{ r.key.id() }}">
     <div class="panel-body">
       {{ r.content|safe }}
+
+      <div id="chart{{ r.key.id() }}" class="chart"></div>
     </div>
   </div>
 

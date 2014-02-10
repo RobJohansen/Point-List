@@ -2,8 +2,8 @@
   <head>
     <meta charset="utf-8" />
 
-    <title>Point-List</title>
-        
+    <title>{{ auth_user.nickname() }}'s Point-List</title>
+
     <link rel="stylesheet" type="text/css" href="styles/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="styles/Krona-One.css">
     <link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css">
@@ -20,46 +20,13 @@
 
     <script type="text/javascript" src="scripts/hc/highcharts.js"></script>
     <script type="text/javascript" src="scripts/hc/modules/exporting.js"></script>
-
-    <script type="text/javascript">
-    //   $(function() {
-    //     $('.chart').highcharts({
-    //       legend: {
-    //         layout: 'vertical',
-    //         align: 'right',
-    //         verticalAlign: 'middle',
-    //         borderWidth: 0
-    //       },
-    //       xAxis: {
-    //         type: 'datetime'
-    //       },
-    //       yAxis: {
-    //         title: {
-    //           text: 'Points'
-    //         },
-    //         min: 0
-    //       },
-    //       series: [
-    //         {% for r in rs %}
-    //           {% if r.key.kind() == 'Membership' %}
-    //             {
-    //               name: '{{ r.name }}',
-    //               data: {{ r.chart_data() }}
-    //             },
-    //           {% endif %}
-    //         {% endfor %}
-    //       ]
-    //     });
-    //   });
-    </script>
-
   </head>
     
   <body>
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="navbar-header">
         <a class="navbar-brand" href="#">
-          Point-List
+          {{ auth_user.nickname() }}'s Point-List
         </a>
       </div>
 
@@ -75,20 +42,8 @@
             <i class="fa fa-plus"></i>
           </a>
 
-          <ul class="dropdown-menu" role="menu">
-            <li class="btn-add-group">
-              <a href="#"></i>Group</a>
-            </li>
-            {% for type, ls in ms|groupby('type') %}
-              <li class="divider"></li>
-              <li class="type">{{ type.get().name }}</li>
-
-              {% for l in ls %}
-                <li class="btn-add" tag="{{ l.key.id() }}">
-                  <a href="#">{{ l.name }}</a>
-                </li>
-              {% endfor %}
-            {% endfor %}
+          <ul id="add-menu" class="dropdown-menu" role="menu">
+            {% include "templates/menu.html" %}
           </ul>
         </li>
 
@@ -104,8 +59,8 @@
     </nav>
 
     <div class="main">
-      <div class="rows">
-        {% for r in a.rows() %}
+      <div id="root" class="rows">
+        {% for r in auth_acct.rows() %}
           {% if r.key.kind() == 'Membership' %}
             {% set sub = false %}
             {% include "templates/row.html" %}
@@ -114,10 +69,6 @@
             {% include "templates/group.html" %}
           {% endif %}
         {% endfor %}
-
-  <!--       <div class="panel panel-default">
-          <div class="chart"></div>
-        </div> -->
       </div>
     </div>
   </body>

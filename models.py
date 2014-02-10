@@ -7,7 +7,7 @@ def current_account():
     u = users.get_current_user()
 
     if u:
-        return Account.query(Account.user_id == u.user_id()).get() or Account().put().get()             # Adds two :)
+        return Account.query(Account.user_id == u.user_id()).get() or Account().put().get()
 
     else:
         return None
@@ -18,12 +18,11 @@ def logout_url(uri):
 
 
 class Account(ndb.Model):
-    name = ndb.StringProperty()
-    user_id = ndb.StringProperty()
+    user_id = ndb.StringProperty(default=users.get_current_user().user_id())
     order = ndb.IntegerProperty(repeated=True)
 
     def rows(self):
-        return filter(lambda x: x is not None, [Group.get_by_id(r) or Membership.get_by_id(r)  for r in self.order])
+        return filter(lambda x: x, [Group.get_by_id(r) or Membership.get_by_id(r)  for r in self.order])
 
 
 class Group(ndb.Model):
@@ -31,7 +30,7 @@ class Group(ndb.Model):
     order = ndb.IntegerProperty(repeated=True)
 
     def rows(self):
-        return filter(lambda x: x is not None, [Membership.get_by_id(r) for r in self.order])
+        return filter(lambda x: x, [Membership.get_by_id(r) for r in self.order])
 
 
 class Type(ndb.Model):

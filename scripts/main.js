@@ -15,9 +15,10 @@ function add_generic(t, url) {
     function(o) {
       var n = $(o.node);
 
-      hookup(n);
-      n.appendTo('.main > .rows');
-      order();                                                                                                  //TODO - Remove From Add Menu
+      hookup_node(n);
+      n.appendTo('#root');
+      order();
+      refresh_menu();
 
       t.toggleClass('fa-plus fa-refresh fa-spin');
     });
@@ -49,12 +50,14 @@ function remove() {
           function(o) {
             var p = t.closest('.panel');
             p.find('.row').each(function() {
-              $(this).appendTo('.main > .rows');
+              $(this).appendTo('#root');
+              refresh_menu();
             });
-            p.remove();                                                                                                  //TODO - Add To Add Menu
+            p.remove();
             
             t.toggleClass('fa-refresh fa-spin');
             order();
+            refresh_menu();
           });
       }
     });
@@ -79,8 +82,8 @@ function edit() {
     t.toggleClass('fa-pencil fa-check');
     t.parent().siblings('.edit').toggle();
     t.parent().siblings('.view').toggle();
-    //f.first().focus();                                                                                        //TODO - Fix Toggling
-    //f.first().val(f.first().val());
+    f.first().focus();                                                                                          //TODO - Fix Toggling/Set focus more than once
+    f.first().val(f.first().val());
   }
 }
 
@@ -163,27 +166,49 @@ function order() {
       $('.message')
         .stop(true, true)
         .show()
-        .delay(3000)
+        .delay(1000)
         .fadeOut(1000);
     });
 }
 
 
-function a() {
-  $(this).parent().find('.btn-grip').first().toggleClass('fa-chevron-right fa-chevron-down');                 //TODO - Don't modify Parents
+function refresh_menu() {
+  $.get(
+    '/menu',
+    function(o) {
+      var n = $('#add-menu')
+
+      n.html($(o.menu));
+      hookup_menu(n);
+    });
 }
 
 
-function b() {
+function collapse(e) {
+  var c = $(this).find('.chart');
+
+  if (c.highcharts()) {                                                                                       // TODO - Draw chart after first update
+    c.highcharts().setSize(
+      $(this).parent().width() - 40,
+      c.height()
+      );
+  }
+
+  $(this).parent().find('.btn-grip').first().toggleClass('fa-chevron-right fa-chevron-down');
+  e.stopPropagation();
+}
+
+
+function hover() {
   $(this).toggleClass('fa-bars fa-chevron-right fa-chevron-down');
 }
 
 
-function hookup(t) {
-  t.find('.collapse').on('show.bs.collapse', a);
-  t.find('.collapse').on('hide.bs.collapse', a);
+function hookup_node(t) {
+  t.find('.collapse').on('show.bs.collapse', collapse);
+  t.find('.collapse').on('hide.bs.collapse', collapse);
 
-  t.find('.btn-grip').hover(b, b);
+  t.find('.btn-grip').hover(hover, hover);
 
   t.find('.btn-remove').click(remove);
   t.find('.btn-update').click(update);
@@ -212,10 +237,28 @@ function hookup(t) {
     .disableSelection();
 }
 
+function hookup_menu(t) {
+  t.find('.btn-add').click(add);
+  t.find('.btn-add-group').click(add_group);     
+}
 
 $(document).ready(function() {
-  $('.btn-add').click(add);
-  $('.btn-add-group').click(add_group);
+    Highcharts.setOptions({
+    title: '',
 
-  hookup($(this));
+    width: '100%',
+
+    xAxis: {
+      type: 'datetime'
+    },
+    yAxis: {
+      title: {
+        text: 'Points'
+      },
+      min: 0
+    },
+  });
+
+  hookup_node($(this));
+  hookup_menu($('#add-menu'));
 });

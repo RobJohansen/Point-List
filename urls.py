@@ -49,15 +49,12 @@ urls = [
         handler=v.Order,
         name='Order'
     ),
+
+    Route(
+        r'/menu',
+        handler=v.Menu,
+        name='Menu'
+    ),
 ]
 
 app = WSGIApplication(urls, debug=True)
-
-
-
-
-    # Route(
-    #     r'/loyalties',
-    #     handler=v.Loyalties,
-    #     name='Loyalties'
-    # ),

@@ -12,22 +12,24 @@ def new_browser():
     return b
 
 
-def get_points_bw(self, m, rs):
+def get_points_bw(self, m, s, rs):
     try:
         # BROWSE
+        logging.info('Loading Browser')
         b = new_browser()
-        b.open(m.scheme.page)
+        b.open(s.page)
 
         b.form = list(b.forms())[0]
-        b[m.scheme.form_user] = m.username
-        b[m.scheme.form_pass] = m.password
+        b[s.form_user] = m.username
+        b[s.form_pass] = m.password
         b.submit()
         
         html = b.open('/mt/www.bestwestern.com/rewards/').read()
         b.close()
 
         # TRAVERSE
-        soup = BeautifulSoup(html).find(id=m.scheme.match)
+        logging.info('Traversing')
+        soup = BeautifulSoup(html).find(id=s.match)
 
         rs['content'] = soup.findChildren()[1]
         rs['points'] = rs['content'].div('div')[1].contents[1][2:]
@@ -43,21 +45,23 @@ def get_points_bw(self, m, rs):
     return rs
 
 
-def get_points_ba(self, m, rs):
+def get_points_ba(self, m, s, rs):
     try:
         # BROWSE
+        logging.info('Loading Browser')
         b = new_browser()
-        b.open(m.scheme.page)
+        b.open(s.page)
 
-        b.select_form(name=m.scheme.form_name)
-        b[m.scheme.form_user] = m.username
-        b[m.scheme.form_pass] = m.password
+        b.select_form(name=s.form_name)
+        b[s.form_user] = m.username
+        b[s.form_pass] = m.password
        
         html = b.submit().read()
         b.close()
 
         # TRAVERSE
-        soup = BeautifulSoup(html).find(id=m.scheme.match)
+        logging.info('Traversing')
+        soup = BeautifulSoup(html).find(id=s.match)
 
         rs['content'] = soup
         rs['points'] = rs['content'].findAll('span', { 'class' : 'nowrap' })[0].string[10:-2]
@@ -197,6 +201,7 @@ def updater(self, m):
         'British Airways'   : get_points_ba,
     }
 
-    f = xs.get(m.scheme.get().name, get_unknown)
+    s = m.scheme.get()
+    f = xs.get(s.name, get_unknown)
 
-    return f(self, m, rs)
+    return f(self, m, s, rs)
