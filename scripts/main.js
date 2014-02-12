@@ -1,3 +1,7 @@
+jQuery.fn.toggleLoading = function() {
+    $(this[0]).toggleClass('fa-refresh fa-spin');
+};
+
 function add() {
   add_generic($(this), 'add');
 }
@@ -20,7 +24,7 @@ function add_generic(t, url) {
       order();
       refresh_menu();
 
-      t.toggleClass('fa-plus fa-refresh fa-spin');
+      t.toggleClass('fa-plus').toggleLoading();
     });
 }
 
@@ -42,7 +46,7 @@ function remove() {
   } else {
     bootbox.confirm("Are you sure you want to delete this?", function(confirmed) {
       if (confirmed) {
-        t.toggleClass('fa-refresh fa-spin');
+        t.toggleLoading();
         
         $.post(
           '/remove',
@@ -55,7 +59,7 @@ function remove() {
             });
             p.remove();
             
-            t.toggleClass('fa-refresh fa-spin');
+            t.toggleLoading();
             order();
             refresh_menu();
           });
@@ -74,7 +78,6 @@ function enter(e) {
 
 function edit() {
   var t = $(this);
-  var f = t.parent().siblings('.edit').find(':input');
 
   if (t.hasClass('fa-check')) {
     submit(t);
@@ -82,8 +85,9 @@ function edit() {
     t.toggleClass('fa-pencil fa-check');
     t.parent().siblings('.edit').toggle();
     t.parent().siblings('.view').toggle();
-    f.first().focus();                                                                                          //TODO - Fix Toggling/Set focus more than once
-    f.first().val(f.first().val());
+    
+    var f = t.parent().siblings('.edit').find(':input').first();
+    f.focus().val(f.val());
   }
 }
 
@@ -91,7 +95,7 @@ function edit() {
 function submit(t) {
   var f = t.parent().siblings('.edit').find(':input');
 
-  t.toggleClass('fa-check fa-refresh fa-spin');
+  t.toggleClass('fa-check').toggleLoading();
 
   f.parent().removeClass('has-error');
 
@@ -105,12 +109,12 @@ function submit(t) {
         });
         t.parent().siblings('.edit').toggle();
         t.parent().siblings('.view').toggle();
-        t.toggleClass('fa-pencil fa-check fa-refresh fa-spin');
+        t.toggleClass('fa-pencil').toggleLoading();
 
         t.closest('.panel-heading').find('.scheme').html(o.name);
       });
   } else {
-    t.toggleClass('fa-check fa-refresh fa-spin');
+    t.toggleClass('fa-check').toggleLoading();
     f.parent().addClass('has-error');
   }
 }
@@ -120,7 +124,7 @@ function update() {
   var t = $(this);
   t.toggleClass('fa-spin');
 
-  t.siblings('.error').html('');
+  t.siblings('.fa-warning').hide();
 
   $.get(
     '/update',
@@ -135,7 +139,7 @@ function update() {
 
         t.siblings('.points').html(o.points);
       } else {
-        t.siblings('.error').html('ERROR');
+        t.siblings('.fa-warning').show();
       }
       
       t.toggleClass('fa-spin');

@@ -90,7 +90,6 @@ class AddGroup(RequestHandler):
         json_response(self, context)
 
 
-
 class Remove(RequestHandler):
     def post(self):
         k = long(self.request.get('key'))

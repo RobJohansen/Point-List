@@ -2,7 +2,7 @@
   <head>
     <meta charset="utf-8" />
 
-    <title>{{ auth_user.nickname() }}'s Point-List</title>
+    <title>Kudos</title>
 
     <link rel="stylesheet" type="text/css" href="styles/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="styles/Krona-One.css">
@@ -26,7 +26,7 @@
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="navbar-header">
         <a class="navbar-brand" href="#">
-          {{ auth_user.nickname() }}'s Point-List
+          {{ auth_user.nickname() }}'s Kudos
         </a>
       </div>
 
@@ -62,10 +62,8 @@
       <div id="root" class="rows">
         {% for r in auth_acct.rows() %}
           {% if r.key.kind() == 'Membership' %}
-            {% set sub = false %}
             {% include "templates/row.html" %}
           {% else %}
-            {% set sub = true %}
             {% include "templates/group.html" %}
           {% endif %}
         {% endfor %}
