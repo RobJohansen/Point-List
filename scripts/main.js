@@ -146,6 +146,8 @@ function update() {
           
           t.toggleClass('fa-spin');
         });
+    } else {
+      t.toggleClass('fa-spin');
     }
   });
 }
@@ -153,7 +155,7 @@ function update() {
 
 function order() {
   var tags = [];
-  $('.main > .rows > * > [tag]').each(function() {
+  $('.main > .groups > * > [tag]').each(function() {
     var t = $(this);
     if (!t.parent().hasClass('row')) {
       var subtags = []

@@ -14,11 +14,9 @@
     <script type="text/javascript" src="scripts/jquery-ui.js"></script>
     <script type="text/javascript" src="scripts/bootstrap.min.js"></script>
     <script type="text/javascript" src="scripts/bootbox.min.js"></script>
+    <script type="text/javascript" src="scripts/hc/highcharts.js"></script>
     
     <script type="text/javascript" src="scripts/main.js"></script>
-
-    <script type="text/javascript" src="scripts/hc/highcharts.js"></script>
-    <script type="text/javascript" src="scripts/hc/modules/exporting.js"></script>
   </head>
     
   <body>
@@ -58,7 +56,7 @@
     </nav>
 
     <div class="main">
-      <div id="root" class="rows">
+      <div id="root" class="rows groups">
         {% for r in auth_acct.rows() %}
           {% if r.key.kind() == 'Membership' %}
             {% include "templates/row.html" %}
