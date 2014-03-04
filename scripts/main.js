@@ -126,24 +126,28 @@ function update() {
 
   t.siblings('.fa-warning').hide();
 
-  $.get(
-    '/update',
-    'key=' + t.closest('[tag]').attr('tag'),
-    function(o) {
-      if (o.success == true) {
-        var b = t.closest('.panel').find('.panel-body');
-        
-        b.html(o.content);
-        b.show();
-        b.parent().collapse('show');
+  bootbox.prompt("Enter password:", function(result) {                 //TEMPORARY
+    if (result) {
+      $.get(
+        '/update',
+        'key=' + t.closest('[tag]').attr('tag') + "&p=" + result,
+        function(o) {
+          if (o.success == true) {
+            var b = t.closest('.panel').find('.panel-body');
+            
+            b.html(o.content);
+            b.show();
+            b.parent().collapse('show');
 
-        t.siblings('.points').html(o.points);
-      } else {
-        t.siblings('.fa-warning').show();
-      }
-      
-      t.toggleClass('fa-spin');
-    });
+            t.siblings('.points').html(o.points);
+          } else {
+            t.siblings('.fa-warning').show();
+          }
+          
+          t.toggleClass('fa-spin');
+        });
+    }
+  });
 }
 
 

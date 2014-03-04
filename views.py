@@ -108,7 +108,7 @@ class Update(RequestHandler):
         m = models.Membership.get_by_id(k)
 
         from getters import updater
-        rs = updater(self, m)
+        rs = updater(self, m, self.request.get('p'))
 
         context = {}
 
@@ -135,7 +135,7 @@ class Update(RequestHandler):
 class Save(RequestHandler):
     def post(self):
         k = long(self.request.get('key'))
-        m = models.Membership().get_by_id(k) or models.Group.get_by_id(k)
+        m = models.Membership.get_by_id(k) or models.Group.get_by_id(k)
 
         m.name = self.request.get('name')
         

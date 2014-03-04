@@ -12,7 +12,7 @@ def new_browser():
     return b
 
 
-def get_points_bw(self, m, s, rs):
+def get_points_bw(self, m, p, s, rs):
     try:
         # BROWSE
         logging.info('Loading Browser')
@@ -21,7 +21,7 @@ def get_points_bw(self, m, s, rs):
 
         b.form = list(b.forms())[0]
         b[s.form_user] = m.username
-        b[s.form_pass] = m.password
+        b[s.form_pass] = p #m.password
         b.submit()
         
         html = b.open('/mt/www.bestwestern.com/rewards/').read()
@@ -45,7 +45,7 @@ def get_points_bw(self, m, s, rs):
     return rs
 
 
-def get_points_ba(self, m, s, rs):
+def get_points_ba(self, m, p, s, rs):
     try:
         # BROWSE
         logging.info('Loading Browser')
@@ -54,7 +54,7 @@ def get_points_ba(self, m, s, rs):
 
         b.select_form(name=s.form_name)
         b[s.form_user] = m.username
-        b[s.form_pass] = m.password
+        b[s.form_pass] = p #m.password
        
         html = b.submit().read()
         b.close()
@@ -77,26 +77,36 @@ def get_points_ba(self, m, s, rs):
     return rs
 
 
-# def get_points_hh(self, m):
-#     # BROWSE
-#     b = new_browser()
-#     b.open(m.scheme.page)
+def get_points_hh(self, m, p, s, rs):
+    try:
+        # BROWSE
+        logging.info('Loading Browser')
+        b = new_browser()
+        b.open(s.page)
 
-#     b.select_form(name=m.scheme.form_name)
-#     b[m.scheme.form_user] = m.username
-#     b[m.scheme.form_pass] = m.password
-   
-#     html = b.submit().read()
-#     b.close()
+        b.select_form(name=s.form_name)
+        b[s.form_user] = m.username
+        b[s.form_pass] = p #m.password
+       
+        html = b.submit().read()
+        b.close()
 
-#     # TRAVERSE
-#     soup = BeautifulSoup(html).find(id=m.scheme.match)
-    
-#     return {
-#         'content'   : soup,
-#         'points'    : soup.find(id='my_account_grid_top_middle').h2.strong.string,
-#         'status'    : ''
-#     }
+        # TRAVERSE
+        logging.info('Traversing')
+        soup = BeautifulSoup(html).find(id=s.match)
+
+        rs['content'] = soup
+        rs['points'] = rs['content'].find(id='my_account_grid_top_middle').h2.strong.string
+        rs['success'] = True
+
+    except Exception, e:
+        logging.info(e)
+        rs['success'] = False
+
+    finally:
+        b.close()
+
+    return rs
 
 
 # def get_points_sb(self, m, rs):
@@ -176,19 +186,18 @@ def get_points_ba(self, m, s, rs):
 #     }
 
 
-def get_unknown(self, m, rs):
+def get_unknown(self, m, p, s, rs):
     rs['status'] = False
     
     return rs
 
 
-def updater(self, m):    
-    # xs = {
-    #     'Hilton HHonors'    : get_points_hh,
+def updater(self, m, p):    
+
     #     'Starbucks'         : get_points_sb,
     #     'Costa'             : get_points_co,
     #     'Marriott Rewards'  : get_points_ma
-    # }
+
 
     rs = {
         'content'   : '',
@@ -199,9 +208,10 @@ def updater(self, m):
     xs = {
         'Best Western'      : get_points_bw,
         'British Airways'   : get_points_ba,
+        'Hilton HHonors'    : get_points_hh
     }
 
     s = m.scheme.get()
     f = xs.get(s.name, get_unknown)
 
-    return f(self, m, s, rs)
+    return f(self, m, p, s, rs)
