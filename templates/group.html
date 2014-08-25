@@ -20,9 +20,9 @@
 
   <div class="collapse in" id="group{{ r.key.id() }}">
     <div class="panel-body">
-      <div class="rows">
+      <div class="rows inner">
         {% for r in r.rows() %}
-          {% include "templates/row.html" %}
+          {% include "templates/structure.html" %}
         {% endfor %}
       </div>
     </div>

@@ -2,6 +2,23 @@ jQuery.fn.toggleLoading = function() {
     $(this[0]).toggleClass('fa-refresh fa-spin');
 };
 
+jQuery.fn.serializeTag = function() {
+  return this.find(' > .rows > .panel').map(function() {
+    var t = $(this);
+
+    return {
+      id      : t.find('> .panel-heading').attr('tag'),
+      subs    : t.find('> * > .panel-body').serializeTag(),
+      isGroup : t.hasClass('group')
+    }
+  }).toArray();
+};
+
+
+
+
+
+
 function add() {
   add_generic($(this), 'add');
 }
@@ -29,6 +46,11 @@ function add_generic(t, url) {
 }
 
 
+
+
+
+
+
 function remove() {
   var t = $(this);
   var p = t.parent();
@@ -45,25 +67,25 @@ function remove() {
     t.siblings('.fa').toggleClass('fa-check fa-pencil');
   } else {
     bootbox.confirm("Are you sure you want to delete this?", function(confirmed) {
-      if (confirmed) {
-        t.toggleLoading();
-        
-        $.post(
-          '/remove',
-          'key=' + t.closest('[tag]').attr('tag'),
-          function(o) {
-            var p = t.closest('.panel');
-            p.find('.row').each(function() {
-              $(this).appendTo('#root');
+        if (confirmed) {
+          t.toggleLoading();
+          
+          $.post(
+            '/remove',
+            'key=' + t.closest('[tag]').attr('tag'),
+            function(o) {
+              var p = t.closest('.panel');
+              p.find('> * > * > * > .panel').each(function() {
+                p.closest('.rows').append($(this));
+              });
+              refresh_menu();
+              p.remove();
+              
+              t.toggleLoading();
+              order();
               refresh_menu();
             });
-            p.remove();
-            
-            t.toggleLoading();
-            order();
-            refresh_menu();
-          });
-      }
+        }
     });
   }
 }
@@ -125,49 +147,46 @@ function update() {
   t.toggleClass('fa-spin');
 
   t.siblings('.fa-warning').hide();
+  
+  bootbox.dialog({
+    message: '<input class="form-control" type="password" placeholder="Password" id="password"></input>',
+    closeButton: false,
+    buttons: {
+      "Ok": {
+        className: "btn-primary",
+        callback: function() {
+          $.get(
+            '/update',
+            'key=' + t.closest('[tag]').attr('tag') + "&p=" + $('#password').val(),
+            function(o) {
+              if (o.success == true) {
+                var b = t.closest('.panel').find('.panel-body');
+                
+                b.html(o.content);
+                b.show();
+                b.parent().collapse('show');
 
-  bootbox.prompt("Enter password:", function(result) {                 //TEMPORARY
-    if (result) {
-      $.get(
-        '/update',
-        'key=' + t.closest('[tag]').attr('tag') + "&p=" + result,
-        function(o) {
-          if (o.success == true) {
-            var b = t.closest('.panel').find('.panel-body');
-            
-            b.html(o.content);
-            b.show();
-            b.parent().collapse('show');
-
-            t.siblings('.points').html(o.points);
-          } else {
-            t.siblings('.fa-warning').show();
-          }
-          
+                t.siblings('.points').html(o.points);
+              } else {
+                t.siblings('.fa-warning').show();
+              }
+              
+              t.toggleClass('fa-spin');
+            });
+        }
+      },
+      "Cancel": {
+        className: "btn-default",
+        callback: function() {
           t.toggleClass('fa-spin');
-        });
-    } else {
-      t.toggleClass('fa-spin');
+        }
+      }
     }
   });
 }
 
-
 function order() {
-  var tags = [];
-  $('.main > .groups > * > [tag]').each(function() {
-    var t = $(this);
-    if (!t.parent().hasClass('row')) {
-      var subtags = []
-
-      t.parent().find('[tag]').each(function() {
-        subtags.push($(this).attr('tag'));
-      });
-
-      tags.push(subtags);
-    }
-    tags.push(t.attr('tag'));
-  });
+  var tags = $('.main').serializeTag();
 
   $.post(
     '/order',
@@ -195,14 +214,14 @@ function refresh_menu() {
 
 
 function collapse(e) {
-  var c = $(this).find('.chart');
-
-  if (c.highcharts()) {                                                                                       // TODO - Draw chart after first update
-    c.highcharts().setSize(
-      $(this).parent().width() - 40,
-      c.height()
-      );
-  }
+  // var c = $(this).find('.chart');
+  //
+  // if (c.highcharts()) {
+  //   c.highcharts().setSize(
+  //     $(this).parent().width() - 40,
+  //     c.height()
+  //     );
+  // }
 
   $(this).parent().find('.btn-grip').first().toggleClass('fa-chevron-right fa-chevron-down');
   e.stopPropagation();
@@ -212,6 +231,9 @@ function collapse(e) {
 function hover() {
   $(this).toggleClass('fa-bars fa-chevron-right fa-chevron-down');
 }
+
+
+
 
 
 function hookup_node(t) {
@@ -228,20 +250,34 @@ function hookup_node(t) {
 
   t.find(':input').keypress(enter);
 
+  t.find('.outer')
+    .sortable({
+      placeholder : 'placeholder',
+      handle      : '.btn-grip',
+      connectWith : '.rows',
+      revert      : true,
+      opacity     : 0.5,
+      start       : function(e, ui) {
+                      ui.placeholder.height(ui.item.height());
+                    },
+      stop        : function(e, ui) {
+                      order();
+                    }
+    })
+    .disableSelection();
+
   t.find('.rows')
     .sortable({
       placeholder : 'placeholder',
       handle      : '.btn-grip',
       connectWith : '.rows',
       revert      : true,
+      opacity     : 0.5,
       start       : function(e, ui) {
                       ui.placeholder.height(ui.item.height());
                     },
       stop        : function(e, ui) {
                       order();
-                    },
-      receive     : function(e, ui) {
-                      if (ui.item.hasClass('group')) $(ui.sender).sortable('cancel');                           //TODO - Recursive Nesting
                     }
     })
     .disableSelection();
@@ -252,6 +288,10 @@ function hookup_menu(t) {
   t.find('.btn-add-group').click(add_group);     
 }
 
+
+
+
+
 $(document).ready(function() {
     Highcharts.setOptions({
     title: '',
@@ -261,6 +301,7 @@ $(document).ready(function() {
     xAxis: {
       type: 'datetime'
     },
+    
     yAxis: {
       title: {
         text: 'Points'

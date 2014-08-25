@@ -18,9 +18,7 @@ def render_with_context(self, filename, context):
     from google.appengine.api import users
 
     context.update({
-        'auth_user' : users.get_current_user(),
-        'auth_acct' : models.current_account(),
-        'auth_url'  : models.logout_url(self.request.uri)
+        'user'          : models.get_user_account()
     })
 
     template = J_ENV.get_template('templates/' + filename)
@@ -30,6 +28,16 @@ def render_with_context(self, filename, context):
 def json_response(self, context):
     self.response.headers['Content-Type'] = 'application/json'
     self.response.out.write(json.dumps(context))
+
+
+
+
+
+
+
+
+
+
 
 
 def menu_items():
@@ -44,6 +52,12 @@ def menu_items():
 
 
 
+
+
+
+
+
+
 class Home(RequestHandler):
     def get(self):
         context = {
@@ -51,6 +65,16 @@ class Home(RequestHandler):
         }
 
         render_with_context(self, 'home.html', context)
+
+
+class AdminConsole(RequestHandler):
+    def get(self):
+        context = {
+
+        }
+
+        render_with_context(self, 'admin.html', context)
+
 
 
 class Menu(RequestHandler):
@@ -97,7 +121,9 @@ class Remove(RequestHandler):
 
         m.key.delete()
 
-        context = {}
+        context = {
+
+        }
 
         json_response(self, context)
 
@@ -110,7 +136,9 @@ class Update(RequestHandler):
         from getters import updater
         rs = updater(self, m, self.request.get('p'))
 
-        context = {}
+        context = {
+
+        }
 
         if rs.get('success'):
             m.content = unicode(rs.get('content'))
@@ -156,20 +184,19 @@ class Order(RequestHandler):
     def post(self):
         k = self.request.get('keys')
 
-        rs = []
+        ks = json.loads(k)
 
-        for r in json.loads(k):
-            if isinstance(r, list):
-                g = models.Group.get_by_id(long(r[0]))
-                g.order = map(long, r[1:])
+        def _order(k):
+            if k['isGroup']:
+                g = models.Group.get_by_id(long(k['id']))
+                g.order = map(_order, k['subs'])
                 g.put()
 
-            else:
-                rs.append(r)
-        
-        a = models.current_account()
-        a.order = map(long, rs)
-        a.put()
+            return long(k['id'])
+                
+        p = models.get_user_profile()
+        p.order = map(_order, ks)
+        p.put()
 
 
 class Do(RequestHandler):

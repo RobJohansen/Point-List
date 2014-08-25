@@ -3,27 +3,28 @@
     <meta charset="utf-8" />
 
     <title>Kudos</title>
+    <link rel="shortcut icon" href="favicon.ico" />
 
-    <link rel="stylesheet" type="text/css" href="styles/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="styles/Krona-One.css">
-    <link rel="stylesheet" type="text/css" href="styles/bootstrap-theme.css">
+    <link rel="stylesheet" type="text/css" href="css/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="css/Krona-One.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap-theme.css">
 
-    <link rel="stylesheet" type="text/css" href="styles/main.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
 
-    <script type="text/javascript" src="scripts/jquery-1.9.1.js"></script>
-    <script type="text/javascript" src="scripts/jquery-ui.js"></script>
-    <script type="text/javascript" src="scripts/bootstrap.min.js"></script>
-    <script type="text/javascript" src="scripts/bootbox.min.js"></script>
-    <script type="text/javascript" src="scripts/hc/highcharts.js"></script>
+    <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="js/jquery-ui.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/bootbox.min.js"></script>
+    <script type="text/javascript" src="js/hc/highcharts.js"></script>
     
-    <script type="text/javascript" src="scripts/main.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
   </head>
     
   <body>
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="navbar-header">
         <a class="navbar-brand" href="#">
-          {{ auth_user.nickname() }}'s Kudos
+          <img src="img/favicon.png" /> Kudos
         </a>
       </div>
 
@@ -49,20 +50,19 @@
             <i class="fa fa-gear"></i>
           </a>
           <ul class="dropdown-menu">
-            <li><a href="{{ auth_url }}">Logout</a></li>
+            {% if user.is_admin %}
+              <li><a href="/admin/">Admin Console</a></li>
+            {% endif %}
+            <li><a href="{{ user.logout_url }}">Logout</a></li>
           </ul>
         </li>
       </ul>
     </nav>
 
     <div class="main">
-      <div id="root" class="rows groups">
-        {% for r in auth_acct.rows() %}
-          {% if r.key.kind() == 'Membership' %}
-            {% include "templates/row.html" %}
-          {% else %}
-            {% include "templates/group.html" %}
-          {% endif %}
+      <div id="root" class="outer rows">
+        {% for r in user.profile.rows() %}
+          {% include "templates/structure.html" %}
         {% endfor %}
       </div>
     </div>

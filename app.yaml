@@ -4,32 +4,41 @@ runtime: python27
 api_version: 1
 threadsafe: yes
 
+
 handlers:
-- url: /admin/.*
-  script: google.appengine.ext.admin.application
-  login: admin
+- url: /css
+  static_dir: css
+
+- url: /js
+  static_dir: js
 
 - url: /favicon\.ico
   static_files: favicon.ico
   upload: favicon\.ico
 
-- url: /styles
-  static_dir: styles
+- url: /img/(.*\.(gif|png|jpg|ico))
+  static_files: img/\1
+  upload: img/(.*\.(gif|png|jpg|ico))
 
-- url: /scripts
-  static_dir: scripts
 
-- url: /images/(.*\.(gif|png|jpg))
-  static_files: images/\1
-  upload: images/(.*\.(gif|png|jpg))
+- url: /admin/console/.*
+  login: admin
+  script: google.appengine.ext.admin.application
+  auth_fail_action: unauthorized
+
+- url: /admin/.*
+  login: admin
+  script: urls.app_admin
+  auth_fail_action: unauthorized
 
 - url: .*
   login: required
   script: urls.app
 
+
 libraries:
 - name: webapp2
-  version: "2.5.2"
+  version: latest
 
 - name: jinja2
   version: "2.6"

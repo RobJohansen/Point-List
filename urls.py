@@ -1,60 +1,70 @@
 from webapp2 import WSGIApplication, Route
-import views as v
+import views
 
 urls = [
     Route(
         r'/',
-        handler=v.Home,
+        handler=views.Home,
         name='Home'
     ),
 
     Route(
         r'/update',
-        handler=v.Update,
+        handler=views.Update,
         name='Update'
     ),
 
     Route(
         r'/remove',
-        handler=v.Remove,
+        handler=views.Remove,
         name='Remove'
     ),
 
     Route(
         r'/save',
-        handler=v.Save,
+        handler=views.Save,
         name='Save'
     ),
 
     Route(
         r'/do',
-        handler=v.Do,
+        handler=views.Do,
         name='Do'
     ),
 
     Route(
         r'/add',
-        handler=v.Add,
+        handler=views.Add,
         name='Add'
     ),
 
     Route(
         r'/add_group',
-        handler=v.AddGroup,
+        handler=views.AddGroup,
         name='AddGroup'
     ),
 
     Route(
         r'/order',
-        handler=v.Order,
+        handler=views.Order,
         name='Order'
     ),
 
     Route(
         r'/menu',
-        handler=v.Menu,
+        handler=views.Menu,
         name='Menu'
-    ),
+    )
+]
+
+urls_admin = [
+    Route(
+        r'/admin/',
+        handler=views.AdminConsole,
+        name='AdminConsole'
+    )
 ]
 
 app = WSGIApplication(urls, debug=True)
+
+app_admin = WSGIApplication(urls_admin, debug=True)
